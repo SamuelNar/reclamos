@@ -1,0 +1,100 @@
+/* General */
+.container {
+  padding: 20px;
+  max-width: 600px;
+  margin: 0 auto;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+}
+
+h2 {
+  text-align: center;
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+/* Form Styling */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+input, select, textarea {
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+input[type="text"], textarea {
+  width: 100%;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+select {
+  width: 100%;
+}
+
+/* Button */
+button {
+  padding: 12px;
+  background-color: #0f66d8;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:disabled {
+  background-color: #ddd;
+  cursor: not-allowed;
+}
+
+button:hover:enabled {
+  background-color: #1e3a8a;
+}
+
+/* Error and Success Messages */
+p {
+  text-align: center;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+.error {
+  color: red;
+}
+
+.success {
+  color: green;
+}
+
+/* Customizing product and description for 'otros' */
+input[type="text"] {
+  background-color: #fafafa;
+}
+
+select, textarea {
+  background-color: #ffffff;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .container {
+    padding: 10px;
+    width: 90%;
+  }
+
+  input, select, textarea, button {
+    font-size: 14px;
+    padding: 8px;
+  }
+}
