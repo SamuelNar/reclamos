@@ -13,7 +13,8 @@ import "./reclamos.css";
 // eslint-disable-next-line react/prop-types
 const Reclamos = ({ token, onLogout }) => {
   const [reclamos, setReclamos] = useState([]);
-  const [role, setRole] = useState("");
+  const [role, setRole] = useState("");  
+  const [selectedStatus, setSelectedStatus] = useState(""); // Estado para el filtro de estado
   const navigate = useNavigate();
 
   const handleLogout = useCallback(async () => {
@@ -31,7 +32,8 @@ const Reclamos = ({ token, onLogout }) => {
       console.error("Error en logout:", err);
     } finally {
       localStorage.removeItem("token");
-      onLogout();
+      setRole("");
+      onLogout(); 
     }
   }, [token, onLogout]);
 
@@ -65,16 +67,22 @@ const Reclamos = ({ token, onLogout }) => {
     fetchReclamos();
     if (token) {
       fetchRole();
+    } else {
+      setRole("");
     }
   }, [token, fetchReclamos, fetchRole]);
 
   const deleteReclamo = async (id) => {
     try {
-      await API.delete(`/reclamos/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      await API.put(
+        `/reclamos/${id}/eliminar`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       fetchReclamos();
     } catch (err) {
       console.error("Error deleting reclamo:", err);
@@ -86,9 +94,8 @@ const Reclamos = ({ token, onLogout }) => {
       inactivo: "activo",
       activo: "en proceso",
       "en proceso": "finalizado",
-      finalizado: "eliminado",
     };
-    const newStatus = statusProgression[currentStatus] || "Inactivo";
+    const newStatus = statusProgression[currentStatus] || "inactivo";
     try {
       await API.patch(
         `/reclamos/${id}/estado`,
@@ -99,12 +106,24 @@ const Reclamos = ({ token, onLogout }) => {
           },
         }
       );
-      // Refresh the reclamos list
       fetchReclamos();
     } catch (err) {
       console.error("Error changing reclamo status:", err);
     }
   };
+
+  // Filtrar los reclamos por estado y eliminados
+  const filteredReclamos = reclamos
+    .filter((reclamo) => {      
+      if (selectedStatus && reclamo.estado !== selectedStatus) {
+        return false; // Filtrar por estado seleccionado
+      }
+      // Mostrar eliminados solo si "eliminado" es seleccionado
+      if (selectedStatus === "eliminado" && reclamo.estado !== "eliminado") {
+        return false;
+      }
+      return true; // Mostrar todo lo demás
+    });
 
   return (
     <div className="reclamos-container">
@@ -121,9 +140,26 @@ const Reclamos = ({ token, onLogout }) => {
         )}
       </div>
 
+      <div className="filters">
+        <div className="status-filter">
+          <label>Filtrar por estado:</label>
+          <select
+            value={selectedStatus}
+            onChange={(e) => setSelectedStatus(e.target.value)} // Establecer directamente el estado del filtro
+          >
+            <option value="">Todos</option>
+            <option value="inactivo">Inactivo</option>
+            <option value="activo">Activo</option>
+            <option value="en proceso">En Proceso</option>
+            <option value="finalizado">Finalizado</option>
+            <option value="eliminado">Eliminado</option> {/* Aquí se agregan los eliminados */}
+          </select>
+        </div>       
+      </div>
+
       <div className="reclamos-list">
-        {reclamos.length > 0 ? (
-          reclamos.map((reclamo) => (
+        {filteredReclamos.length > 0 ? (
+          filteredReclamos.map((reclamo) => (
             <div
               key={reclamo.id}
               className="reclamo-item"

@@ -41,7 +41,8 @@
 
 .logout-button,
 .login-button,
-.create-button {
+.create-button,
+.button-hide {
   padding: 10px 20px;
   border: none;
   border-radius: 8px;
@@ -205,3 +206,44 @@
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
+.button-hide {
+  background-color: var(--button-secondary);
+  color: white;
+  margin-top: 20px;
+  display: block;
+  margin-left: auto;
+  margin-right: 0;
+}
+
+.filters {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.status-filter, .eliminados-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.status-filter label,
+.eliminados-toggle button {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.status-filter select {
+  padding: 8px 12px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: #f9f9f9;
+}
+
+.status-filter select:focus {
+  border-color: #0f66d8;
+  outline: none;
+}

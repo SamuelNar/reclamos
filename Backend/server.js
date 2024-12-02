@@ -202,11 +202,11 @@ app.put("/reclamos/:id", authenticateToken, async (req, res) => {
   }
 });
 
-app.delete("/reclamos/:id", authenticateToken, async (req, res) => {
+app.put("/reclamos/:id/eliminar", authenticateToken, async (req, res) => {
   const { id } = req.params;
 
   try {
-    const [result] = await db.query("DELETE FROM reclamos WHERE id = ?", [id]);
+    const [result] = await db.query("UPDATE reclamos SET estado = 'eliminado' WHERE id = ?", [id]);
 
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: "Reclamo no encontrado" });
@@ -219,7 +219,6 @@ app.delete("/reclamos/:id", authenticateToken, async (req, res) => {
       .json({ error: "Error al eliminar reclamo", details: error.message });
   }
 });
-
 
 app.patch("/reclamos/:id/estado", async (req, res) => {
   const { id } = req.params;
