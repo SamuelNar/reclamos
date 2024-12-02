@@ -17,6 +17,7 @@ const Reclamos = ({ token, onLogout }) => {
   const [selectedStatus, setSelectedStatus] = useState(""); // Estado para el filtro de estado
   const navigate = useNavigate();
 
+
   const handleLogout = useCallback(async () => {
     try {
       await API.post(
@@ -114,7 +115,7 @@ const Reclamos = ({ token, onLogout }) => {
 
   // Filtrar los reclamos por estado y eliminados
   const filteredReclamos = reclamos
-    .filter((reclamo) => {      
+    .filter((reclamo) => {    
       if (selectedStatus && reclamo.estado !== selectedStatus) {
         return false; // Filtrar por estado seleccionado
       }
@@ -124,6 +125,7 @@ const Reclamos = ({ token, onLogout }) => {
       }
       return true; // Mostrar todo lo demás
     });
+    
 
   return (
     <div className="reclamos-container">
@@ -169,7 +171,8 @@ const Reclamos = ({ token, onLogout }) => {
               <p>Estado: {reclamo.estado}</p>
               <p>Producto: {reclamo.producto}</p>
               <p>Asignado: {reclamo.asignado || "No asignado"}</p>
-              <p>Importancia: {reclamo.importancia}</p>
+              <p>Importancia: {reclamo.importancia}</p>            
+              <p>Imp: {reclamo.observaciones}</p>  
               <p>{reclamo.descripcion}</p>
               <p>
                 Fecha:{" "}

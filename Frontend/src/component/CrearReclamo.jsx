@@ -6,7 +6,6 @@ function CrearReclamo() {
   const navigate = useNavigate();
   const location = useLocation();
   const reclamo = location.state?.reclamo || null;
-
   const [formData, setFormData] = useState({
     nombre: reclamo?.nombre || "",
     producto: reclamo?.producto || "",
@@ -15,6 +14,7 @@ function CrearReclamo() {
     descripcionPersonalizada: "",
     importancia: reclamo?.importancia || "",
     estado: reclamo?.estado || "",
+    observaciones: reclamo?.observaciones || "Ingrese observaciones",
     asignado: reclamo?.asignado || "",
   });
 
@@ -56,6 +56,7 @@ function CrearReclamo() {
         formData.descripcion === "otros"
           ? formData.descripcionPersonalizada
           : formData.descripcion,
+
     };
 
     try {
@@ -108,7 +109,7 @@ function CrearReclamo() {
             onChange={handleChange}
             required
           />
-          
+
           <select
             name="producto"
             value={formData.producto}
@@ -202,7 +203,17 @@ function CrearReclamo() {
             <option value="Agustin b">Agustin b</option>
             <option value="Matias">Matias</option>
           </select>
-
+          
+          <input
+            type="text"
+            value={formData.observaciones}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                observaciones: e.target.value || "Ingrese observaciones", // Si está vacío, se asigna "Ingrese observaciones"
+              })
+            }
+          />
           {error && <div className="error-message">{error}</div>}
           {success && <div className="success-message">{success}</div>}
 
@@ -214,8 +225,8 @@ function CrearReclamo() {
             {loading
               ? "Enviando..."
               : reclamo
-              ? "Guardar Cambios"
-              : "Crear Reclamo"}
+                ? "Guardar Cambios"
+                : "Crear Reclamo"}
           </button>
         </form>
       </div>

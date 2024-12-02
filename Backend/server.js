@@ -62,7 +62,7 @@ app.post("/auth/login", async (req, res) => {
   const { username, password } = req.body;
 
   try {
-    const [rows] = await db.query("SELECT * FROM usuarios WHERE username = ?", [
+    const [rows] = await db.query("SELECT * FROM usuarios WHERE nombre = ?", [
       username,
     ]);
     const user = rows[0];
@@ -116,7 +116,8 @@ app.post("/reclamos", authenticateToken, async (req, res) => {
     productoPersonalizado,
     descripcion, 
     descripcionPersonalizada,
-    importancia, 
+    importancia,
+    observaciones, 
     estado, 
     asignado 
   } = req.body;
@@ -131,8 +132,8 @@ app.post("/reclamos", authenticateToken, async (req, res) => {
 
   try {
     const [result] = await db.query(
-      "INSERT INTO reclamos (nombre, producto, descripcion, importancia, estado, asignado) VALUES (?, ?, ?, ?, ?, ?)",
-      [nombre, finalProducto, finalDescripcion, importancia, estado, asignado]
+      "INSERT INTO reclamos (nombre, producto, descripcion, importancia,observaciones, estado, asignado) VALUES (?, ?, ?, ?, ?, ?,?)",
+      [nombre, finalProducto, finalDescripcion, importancia, observaciones,estado, asignado]
     );
 
     res.status(201).json({
@@ -141,6 +142,7 @@ app.post("/reclamos", authenticateToken, async (req, res) => {
       producto: finalProducto,
       descripcion: finalDescripcion,
       importancia,
+      observaciones,
       estado,
       asignado
     });
@@ -161,6 +163,7 @@ app.put("/reclamos/:id", authenticateToken, async (req, res) => {
     descripcion, 
     descripcionPersonalizada,
     importancia, 
+    observaciones,
     estado, 
     asignado 
   } = req.body;
@@ -176,8 +179,8 @@ app.put("/reclamos/:id", authenticateToken, async (req, res) => {
 
   try {
     const [result] = await db.query(
-      "UPDATE reclamos SET nombre = ?, producto = ?, descripcion = ?, importancia = ?, estado = ?, asignado = ? WHERE id = ?",
-      [nombre, finalProducto, finalDescripcion, importancia, estado, asignado, id]
+      "UPDATE reclamos SET nombre = ?, producto = ?, descripcion = ?, importancia = ?, observaciones = ?, estado = ?, asignado = ? WHERE id = ?",
+      [nombre, finalProducto, finalDescripcion, importancia, observaciones,estado, asignado, id]
     );
 
     // Verificar si se actualizó algún registro

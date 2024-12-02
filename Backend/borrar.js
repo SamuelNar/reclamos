@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import mysql from 'mysql2/promise';
 import bcrypt from 'bcrypt';
 
-const secretKey = 'your_secret_key'; // Cambia esto a un secreto seguro
+const secretKey = 'your_secret_key'; 
 
 (async () => {
   const dbConfig = {
@@ -39,7 +39,7 @@ const secretKey = 'your_secret_key'; // Cambia esto a un secreto seguro
     ]);
 
     // Generar token JWT para el usuario
-    const token = jwt.sign({ id: 1, role: 'admin' }, secretKey, { expiresIn: '1h' }); // ID ajustado según tu base
+    const token = jwt.sign({ id: 1, role: 'admin' }, secretKey, { expiresIn: '1h' });
 
     console.log('Usuario administrador creado con éxito.');
     console.log('Token JWT:', token);

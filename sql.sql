@@ -1,9 +1,10 @@
 CREATE TABLE reclamos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
-    producto ENUM('camara', 'internet', 'telecomunicaciones', 'otros') NOT NULL,
+    producto VARCHAR(100) NOT NULL,
     descripcion TEXT NOT NULL,
     importancia ENUM('alta', 'media', 'baja') NOT NULL,
+    observaciones TEXT,
     estado ENUM('inactivo', 'activo', 'en proceso', 'finalizado', 'eliminado') NOT NULL,
     fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
     asignado varchar(100) NOT NULL
@@ -17,8 +18,6 @@ CREATE TABLE usuarios (
   rol ENUM('admin', 'usuario') DEFAULT 'usuario',  -- admin o usuario
   fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-
-ALTER TABLE reclamos CHANGE producto producto VARCHAR(100) NOT NULL;
 
 
 INSERT INTO reclamos (nombre, producto, descripcion, importancia, estado, asignado) 
