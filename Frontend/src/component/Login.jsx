@@ -20,11 +20,10 @@ const Login = ({ onLogin }) => {
         password 
       });
       
-      // Verifica que la respuesta tenga un token
       if (response.data && response.data.token) {
         localStorage.setItem('token', response.data.token);
         onLogin(response.data.token);
-        navigate('/'); // Redirige a la página principal después del login
+        navigate('/');
       } else {
         setError('Respuesta del servidor inesperada');
       }
@@ -34,13 +33,22 @@ const Login = ({ onLogin }) => {
     }
   };
 
+  const handleHome = () => {
+    navigate("/");
+  }
+
   return (
     <div className="login-container">
-      <h2>Iniciar Sesión</h2>
+      <div className='home_button_container'>
+        <button onClick={handleHome} className="home_button">Inicio</button>
+      </div>
       <form onSubmit={handleSubmit}>
+        
+        <h2>Iniciar Sesión</h2>
         <div className="form-group">
           <label htmlFor="username">Usuario</label>
           <input
+            className='input_username'
             id="username"
             type="text"
             placeholder="Ingrese su usuario"
@@ -52,6 +60,7 @@ const Login = ({ onLogin }) => {
         <div className="form-group">
           <label htmlFor="password">Contraseña</label>
           <input
+            className='input_password'
             id="password"
             type="password"
             placeholder="Ingrese su contraseña"
@@ -60,8 +69,7 @@ const Login = ({ onLogin }) => {
             required
           />
         </div>
-        <button type="submit">Iniciar Sesión</button>
-        
+        <button className='login_button' type="submit">Iniciar Sesión</button>        
         {error && <p className="error-message">{error}</p>}
       </form>
     </div>

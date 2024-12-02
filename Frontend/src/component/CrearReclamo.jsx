@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import './crearReclamo.css'; 
+import "./crearReclamo.css";
 
 function CrearReclamo() {
   const navigate = useNavigate();
@@ -10,24 +10,23 @@ function CrearReclamo() {
   const [formData, setFormData] = useState({
     nombre: reclamo?.nombre || "",
     producto: reclamo?.producto || "",
-    productoPersonalizado: "", // Para producto personalizado
+    productoPersonalizado: "",
     descripcion: reclamo?.descripcion || "",
-    descripcionPersonalizada: "", // Para descripción personalizada
+    descripcionPersonalizada: "",
     importancia: reclamo?.importancia || "",
     estado: reclamo?.estado || "",
     asignado: reclamo?.asignado || "",
   });
 
   const [descripcionOpciones, setDescripcionOpciones] = useState([]);
-  const [loading, setLoading] = useState(false); // Estado para manejar la carga
-  const [error, setError] = useState(""); // Estado para los errores
-  const [success, setSuccess] = useState(""); // Estado para el éxito
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
 
-    // Manejo dinámico de opciones de descripción
     if (name === "producto") {
       if (value === "camara") {
         setDescripcionOpciones(["Lente roto", "No enfoca"]);
@@ -36,7 +35,7 @@ function CrearReclamo() {
       } else if (value === "telecomunicaciones") {
         setDescripcionOpciones(["Línea caída", "Interferencia"]);
       } else {
-        setDescripcionOpciones([]); // Vaciar opciones si es "Otros" u otra selección
+        setDescripcionOpciones([]);
       }
     }
   };
@@ -44,8 +43,8 @@ function CrearReclamo() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError(""); // Limpiar errores anteriores
-    setSuccess(""); // Limpiar éxito anterior
+    setError("");
+    setSuccess("");
 
     const reclamoData = {
       ...formData,
@@ -60,7 +59,7 @@ function CrearReclamo() {
     };
 
     try {
-      const token = localStorage.getItem("token"); // Obtener el token desde localStorage
+      const token = localStorage.getItem("token");
       const method = reclamo ? "PUT" : "POST";
       const endpoint = reclamo
         ? `http://localhost:3000/reclamos/${reclamo.id}`
@@ -76,13 +75,13 @@ function CrearReclamo() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Error al procesar el reclamo');
+        throw new Error(errorData.error || "Error al procesar el reclamo");
       }
 
       setSuccess(
         reclamo ? "Reclamo actualizado con éxito" : "Reclamo creado con éxito"
       );
-      setTimeout(() => navigate("/"), 1000); // Redirige después de 2 segundos
+      setTimeout(() => navigate("/"), 1000);
     } catch (error) {
       setError(error.message || "Hubo un problema al procesar el reclamo");
     } finally {
@@ -90,122 +89,137 @@ function CrearReclamo() {
     }
   };
 
+  const handleHome = () => {
+    navigate("/");
+  }
+
   return (
-    <div className="container" style={{ padding: "20px" }}>
-    <h2>{reclamo ? "Editar Reclamo" : "Crear Reclamo"}</h2>
-    <form
-      onSubmit={handleSubmit}
-      style={{ display: "flex", flexDirection: "column", gap: "10px" }}
-    >
-      <input
-        name="nombre"
-        placeholder="Nombre"
-        value={formData.nombre}
-        onChange={handleChange}
-        required
-      />
-      <select
-        name="producto"
-        value={formData.producto}
-        onChange={handleChange}
-        required
-      >
-        <option value="">Seleccionar Producto</option>
-        <option value="camara">Cámara</option>
-        <option value="internet">Internet</option>
-        <option value="telecomunicaciones">Telecomunicaciones</option>
-        <option value="otros">Otros</option>
-      </select>
-      {formData.producto === "otros" && (
-        <input
-          name="productoPersonalizado"
-          placeholder="Producto Personalizado"
-          value={formData.productoPersonalizado}
-          onChange={handleChange}
-          required
-        />
-      )}
-      
-      {/* Modificación para manejar descripción cuando producto es "otros" */}
-      {(descripcionOpciones.length > 0 || formData.producto === "otros") && (
-        <select
-          name="descripcion"
-          value={formData.descripcion}
-          onChange={handleChange}
-          required
-        >
-          <option value="">Seleccionar Descripción</option>
-          {descripcionOpciones.length > 0 && 
-            descripcionOpciones.map((opcion, index) => (
-              <option key={index} value={opcion}>
-                {opcion}
-              </option>
-            ))
-          }
-          <option value="otros">Otros</option>
-        </select>
-      )}
-      
-      {formData.descripcion === "otros" && (
-        <textarea
-          name="descripcionPersonalizada"
-          placeholder="Descripción Personalizada"
-          value={formData.descripcionPersonalizada}
-          onChange={handleChange}
-          required
-        />
-      )}
-      
-      <select
-        name="importancia"
-        value={formData.importancia}
-        onChange={handleChange}
-        required
-      >
-        <option value="">Seleccionar Importancia</option>
-        <option value="alta">Alta</option>
-        <option value="media">Media</option>
-        <option value="baja">Baja</option>
-      </select>
-      <select
-        name="estado"
-        value={formData.estado}
-        onChange={handleChange}
-        required
-      >
-        <option value="">Seleccionar Estado</option>
-        <option value="activo">Inactivo</option>
-        <option value="inactivo">Activo</option>
-        <option value="en proceso">En Proceso</option>
-        <option value="finalizado">Finalizado</option>
-        <option value="eliminado">Eliminado</option>
-      </select>
-      <select
-        name="asignado"
-        value={formData.asignado}
-        onChange={handleChange}
-        required
-      >
-        <option value="">Asignar a</option>
-        <option value="samuel">Samuel</option>
-        <option value="maxi">Maxi</option>
-      </select>
-      
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      {success && <p style={{ color: "green" }}>{success}</p>}
-      <button
-        type="submit"
-        style={{ background: "#0f66d8", color: "white" }}
-        disabled={loading}
-      >
-        {loading
-          ? "Enviando..."
-          : reclamo
-          ? "Guardar Cambios"
-          : "Crear Reclamo"}
-      </button>
-    </form>
-  </div>
+    <div className="container">
+      <div className="form-wrapper">
+        <button onClick={handleHome} className="home_button">Inicio</button>
+        <h2 className="text_reclamos">
+          {reclamo ? "Editar Reclamo" : "Crear Reclamo"}
+        </h2>
+        <form onSubmit={handleSubmit} className="form_reclamos_create">
+          <input
+            name="nombre"
+            placeholder="Nombre"
+            value={formData.nombre}
+            onChange={handleChange}
+            required
+          />
+          
+          <select
+            name="producto"
+            value={formData.producto}
+            onChange={handleChange}
+            required
+          >
+            <option value="">Seleccionar Producto</option>
+            <option value="camara">Cámara</option>
+            <option value="internet">Internet</option>
+            <option value="telecomunicaciones">Telecomunicaciones</option>
+            <option value="otros">Otros</option>
+          </select>
+
+          {formData.producto === "otros" && (
+            <input
+              name="productoPersonalizado"
+              placeholder="Producto Personalizado"
+              value={formData.productoPersonalizado}
+              onChange={handleChange}
+              required
+            />
+          )}
+
+          {(descripcionOpciones.length > 0 || formData.producto === "otros") && (
+            <select
+              name="descripcion"
+              value={formData.descripcion}
+              onChange={handleChange}
+              required
+            >
+              <option value="">Seleccionar Descripción</option>
+              {descripcionOpciones.length > 0 &&
+                descripcionOpciones.map((opcion, index) => (
+                  <option key={index} value={opcion}>
+                    {opcion}
+                  </option>
+                ))}
+              <option value="otros">Otros</option>
+            </select>
+          )}
+
+          {formData.descripcion === "otros" && (
+            <textarea
+              name="descripcionPersonalizada"
+              placeholder="Descripción Personalizada"
+              value={formData.descripcionPersonalizada}
+              onChange={handleChange}
+              required
+            />
+          )}
+
+          <select
+            name="importancia"
+            value={formData.importancia}
+            onChange={handleChange}
+            required
+          >
+            <option value="">Seleccionar Importancia</option>
+            <option value="alta">Alta</option>
+            <option value="media">Media</option>
+            <option value="baja">Baja</option>
+          </select>
+
+          <select
+            name="estado"
+            value={formData.estado}
+            onChange={handleChange}
+            required
+          >
+            <option value="">Seleccionar Estado</option>
+            <option value="inactivo">Inactivo</option>
+            <option value="activo">Activo</option>
+            <option value="en proceso">En Proceso</option>
+            <option value="finalizado">Finalizado</option>
+            <option value="eliminado">Eliminado</option>
+          </select>
+
+          <select
+            name="asignado"
+            value={formData.asignado}
+            onChange={handleChange}
+            required
+          >
+            <option value="">Asignar a</option>
+            <option value="Samuel">Samuel</option>
+            <option value="Maxi">Maxi</option>
+            <option value="Joel">Joel</option>
+            <option value="Agustin">Agustin</option>
+            <option value="Silvio">Silvio</option>
+            <option value="Gabriel">Gabriel</option>
+            <option value="Agustin b">Agustin b</option>
+            <option value="Matias">Matias</option>
+          </select>
+
+          {error && <div className="error-message">{error}</div>}
+          {success && <div className="success-message">{success}</div>}
+
+          <button
+            type="submit"
+            className="button_create"
+            disabled={loading}
+          >
+            {loading
+              ? "Enviando..."
+              : reclamo
+              ? "Guardar Cambios"
+              : "Crear Reclamo"}
+          </button>
+        </form>
+      </div>
+    </div>
   );
 }
 

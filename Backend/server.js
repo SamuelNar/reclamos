@@ -220,6 +220,41 @@ app.delete("/reclamos/:id", authenticateToken, async (req, res) => {
   }
 });
 
+
+app.patch("/reclamos/:id/estado", async (req, res) => {
+  const { id } = req.params;
+  const { estado } = req.body;
+
+  // Validar que se proporcione un estado
+  if (!estado) {
+    return res.status(400).json({ error: "El estado es obligatorio" });
+  }
+
+  try {
+    const [result] = await db.query(
+      "UPDATE reclamos SET estado = ? WHERE id = ?",
+      [estado, id]
+    );
+
+    // Verificar si se actualizó algún registro
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "Reclamo no encontrado" });
+    }
+
+    res.status(200).json({
+      id,
+      message: "Estado del reclamo actualizado exitosamente",
+      nuevoEstado: estado
+    });
+  } catch (error) {
+    console.error("Error al actualizar el estado del reclamo:", error);
+    res.status(500).json({ 
+      error: "Error al actualizar el estado del reclamo", 
+      details: error.message 
+    });
+  }
+});
+
 // Iniciar servidor
 app.listen(PORT, () => {
   console.log(`Servidor ejecutándose en http://localhost:${PORT}`);

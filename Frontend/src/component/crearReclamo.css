@@ -1,100 +1,113 @@
-/* General */
+/* crearReclamo.css */
+:root {
+  --primary-color: #2c3e50;
+  --secondary-color: #3498db;
+  --background-color: #f4f6f7;
+  --input-border-color: #bdc3c7;
+  --error-color: #e74c3c;
+  --success-color: #2ecc71;
+}
+
 .container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: var(--background-color);
   padding: 20px;
-  max-width: 600px;
-  margin: 0 auto;
-  background-color: #f9f9f9;
-  border-radius: 8px;
+  font-family: 'Arial', sans-serif;
 }
 
-h2 {
+.form-wrapper {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  padding: 40px;
+  width: 100%;
+  max-width: 500px;
+}
+
+.text_reclamos {
   text-align: center;
-  font-size: 24px;
-  color: #333;
-  margin-bottom: 20px;
+  color: var(--primary-color);
+  margin-bottom: 30px;
+  font-size: 2rem;
+  font-weight: bold;
 }
 
-/* Form Styling */
-form {
+.form_reclamos_create {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 20px;
 }
 
-input, select, textarea {
-  padding: 10px;
-  font-size: 16px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-}
-
-input[type="text"], textarea {
+.form_reclamos_create input,
+.form_reclamos_create select,
+.form_reclamos_create textarea {
   width: 100%;
+  padding: 12px 15px;
+  border: 2px solid var(--input-border-color);
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
 }
 
-textarea {
-  resize: vertical;
-  min-height: 100px;
+.form_reclamos_create input:focus,
+.form_reclamos_create select:focus,
+.form_reclamos_create textarea:focus {
+  outline: none;
+  border-color: var(--secondary-color);
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
 }
 
-select {
-  width: 100%;
-}
-
-/* Button */
-button {
-  padding: 12px;
-  background-color: #0f66d8;
+.button_create {
+  background-color: var(--secondary-color);
   color: white;
   border: none;
-  border-radius: 5px;
-  font-size: 16px;
+  padding: 15px;
+  border-radius: 8px;
+  font-size: 1rem;
   cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-button:disabled {
-  background-color: #ddd;
-  cursor: not-allowed;
-}
-
-button:hover:enabled {
-  background-color: #1e3a8a;
-}
-
-/* Error and Success Messages */
-p {
-  text-align: center;
-  font-size: 14px;
+  transition: all 0.3s ease;
   margin-top: 10px;
 }
 
-.error {
-  color: red;
+.button_create:hover {
+  background-color: #2980b9;
+  transform: translateY(-2px);
 }
 
-.success {
-  color: green;
+.button_create:disabled {
+  background-color: #bdc3c7;
+  cursor: not-allowed;
 }
 
-/* Customizing product and description for 'otros' */
-input[type="text"] {
-  background-color: #fafafa;
+.error-message {
+  color: var(--error-color);
+  background-color: #ffebee;
+  padding: 10px;
+  border-radius: 8px;
+  text-align: center;
+  margin-bottom: 15px;
 }
 
-select, textarea {
-  background-color: #ffffff;
+.success-message {
+  color: var(--success-color);
+  background-color: #e8f5e9;
+  padding: 10px;
+  border-radius: 8px;
+  text-align: center;
+  margin-bottom: 15px;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-  .container {
-    padding: 10px;
-    width: 90%;
-  }
-
-  input, select, textarea, button {
-    font-size: 14px;
-    padding: 8px;
-  }
+.home_button {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 15px;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 10px;
 }
