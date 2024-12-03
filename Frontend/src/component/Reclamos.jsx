@@ -120,7 +120,7 @@ const Reclamos = ({ token, onLogout }) => {
 
   const updateObservaciones = async (id) => {
     try {
-      await API.patch(
+      await API.put(
         `/reclamos/${id}/observaciones`,
         { observaciones: tempObservaciones },
         {
@@ -251,13 +251,13 @@ const Reclamos = ({ token, onLogout }) => {
                         {reclamo.observaciones}
                         {(reclamo.estado === "en proceso" ||
                           reclamo.estado === "finalizado") && (
-                          <button
-                            onClick={() => startEditObservaciones(reclamo)}
-                            className="edit-observaciones-button"
-                          >
-                            <FontAwesomeIcon icon={faEdit} />
-                          </button>
-                        )}
+                            <button
+                              onClick={() => startEditObservaciones(reclamo)}
+                              className="edit-observaciones-button"
+                            >
+                              <FontAwesomeIcon icon={faEdit} />
+                            </button>
+                          )}
                       </>
                     )}
                   </span>
@@ -270,14 +270,14 @@ const Reclamos = ({ token, onLogout }) => {
               </p>
 
               <div className="reclamo-status-actions">
-                <button
-                  className="change-status-button"
-                  onClick={() =>
-                    changeReclamoStatus(reclamo.id, reclamo.estado)
-                  }
-                >
-                  <FontAwesomeIcon icon={faSyncAlt} /> Cambiar Estado
-                </button>
+                {reclamo.estado !== "finalizado" && reclamo.estado !== "eliminado" && (
+                  <button
+                    className="change-status-button"
+                    onClick={() => changeReclamoStatus(reclamo.id, reclamo.estado)}
+                  >
+                    <FontAwesomeIcon icon={faSyncAlt} /> Cambiar Estado
+                  </button>
+                )}
                 {role === "admin" && (
                   <div className="reclamo-actions">
                     <button onClick={() => deleteReclamo(reclamo.id)}>
