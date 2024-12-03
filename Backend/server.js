@@ -223,6 +223,25 @@ app.put("/reclamos/:id/eliminar", authenticateToken, async (req, res) => {
   }
 });
 
+app.put("/reclamos/:id/observaciones", async (req, res) => {
+  const { id } = req.params;
+  const { observaciones } = req.body; // Get observaciones from request body
+
+  try {
+    const [result] = await db.query("UPDATE reclamos SET observaciones = ? WHERE id = ?", [observaciones, id]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "Reclamo no encontrado" });
+    }
+
+    res.status(200).json({ message: "Reclamo modificado" });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "Error al modificar reclamo", details: error.message });
+  }
+});
+
 app.patch("/reclamos/:id/estado", async (req, res) => {
   const { id } = req.params;
   const { estado } = req.body;

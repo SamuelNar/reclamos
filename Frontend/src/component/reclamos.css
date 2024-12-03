@@ -247,3 +247,98 @@
   border-color: #0f66d8;
   outline: none;
 }
+
+
+.observaciones-container {
+  position: relative;
+}
+
+.edit-observaciones-button {
+  margin-left: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.observaciones-textarea {
+  width: 100%;
+  min-height: 100px;
+  margin-bottom: 10px;
+}
+
+.observaciones-edit-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.search-filter {
+  display: flex;
+  align-items: center;
+  position: relative;
+  margin-left: 20px;
+}
+
+.search-input {
+  padding: 8px 30px 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  width: 200px;
+}
+
+.search-icon {
+  position: absolute;
+  right: 10px;
+  color: #888;
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+  .filters {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .status-filter, .search-filter {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .status-filter select, 
+  .search-filter .search-input {
+    width: 100%;
+  }
+
+  .reclamos-container {
+    padding: 10px;
+  }
+
+  .reclamo-item {
+    padding: 15px;
+  }
+
+  .reclamo-status-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .reclamo-status-actions button, 
+  .reclamo-actions button {
+    width: 100%;
+  }
+
+  .header {
+    flex-direction: column;
+    text-align: center;
+    gap: 10px;
+  }
+
+  .header h1 {
+    margin-bottom: 10px;
+  }
+
+  .observaciones-edit-buttons {
+    flex-direction: column;
+    gap: 10px;
+  }
+}

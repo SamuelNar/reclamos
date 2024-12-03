@@ -4,6 +4,9 @@ import {
   faSyncAlt,
   faTrashAlt,
   faEdit,
+  faSave,
+  faTimes,
+  faSearch,
 } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 import API from "../utils/api";
@@ -13,10 +16,12 @@ import "./reclamos.css";
 // eslint-disable-next-line react/prop-types
 const Reclamos = ({ token, onLogout }) => {
   const [reclamos, setReclamos] = useState([]);
-  const [role, setRole] = useState("");  
-  const [selectedStatus, setSelectedStatus] = useState(""); // Estado para el filtro de estado
+  const [role, setRole] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [editingObservaciones, setEditingObservaciones] = useState(null);
+  const [tempObservaciones, setTempObservaciones] = useState("");
   const navigate = useNavigate();
-
 
   const handleLogout = useCallback(async () => {
     try {
@@ -34,7 +39,7 @@ const Reclamos = ({ token, onLogout }) => {
     } finally {
       localStorage.removeItem("token");
       setRole("");
-      onLogout(); 
+      onLogout();
     }
   }, [token, onLogout]);
 
@@ -113,19 +118,51 @@ const Reclamos = ({ token, onLogout }) => {
     }
   };
 
-  // Filtrar los reclamos por estado y eliminados
-  const filteredReclamos = reclamos
-    .filter((reclamo) => {    
-      if (selectedStatus && reclamo.estado !== selectedStatus) {
-        return false; // Filtrar por estado seleccionado
-      }
-      // Mostrar eliminados solo si "eliminado" es seleccionado
-      if (selectedStatus === "eliminado" && reclamo.estado !== "eliminado") {
-        return false;
-      }
-      return true; // Mostrar todo lo demás
-    });
-    
+  const updateObservaciones = async (id) => {
+    try {
+      await API.patch(
+        `/reclamos/${id}/observaciones`,
+        { observaciones: tempObservaciones },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      fetchReclamos();
+      setEditingObservaciones(null);
+    } catch (err) {
+      console.error("Error updating observaciones:", err);
+    }
+  };
+
+  const startEditObservaciones = (reclamo) => {
+    setEditingObservaciones(reclamo.id);
+    setTempObservaciones(reclamo.observaciones || "");
+  };
+
+  const cancelEditObservaciones = () => {
+    setEditingObservaciones(null);
+    setTempObservaciones("");
+  };
+
+  const filteredReclamos = reclamos.filter((reclamo) => {
+    // Filtro por estado
+    if (selectedStatus && reclamo.estado !== selectedStatus) {
+      return false;
+    }
+    if (selectedStatus === "eliminado" && reclamo.estado !== "eliminado") {
+      return false;
+    }
+
+    // Filtro por búsqueda de nombre
+    if (searchTerm) {
+      const searchTermLower = searchTerm.toLowerCase();
+      return reclamo.nombre.toLowerCase().includes(searchTermLower);
+    }
+
+    return true;
+  });
 
   return (
     <div className="reclamos-container">
@@ -147,16 +184,27 @@ const Reclamos = ({ token, onLogout }) => {
           <label>Filtrar por estado:</label>
           <select
             value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e.target.value)} // Establecer directamente el estado del filtro
+            onChange={(e) => setSelectedStatus(e.target.value)}
           >
             <option value="">Todos</option>
             <option value="inactivo">Inactivo</option>
             <option value="activo">Activo</option>
             <option value="en proceso">En Proceso</option>
             <option value="finalizado">Finalizado</option>
-            <option value="eliminado">Eliminado</option> {/* Aquí se agregan los eliminados */}
+            <option value="eliminado">Eliminado</option>
           </select>
-        </div>       
+        </div>
+
+        <div className="search-filter">
+          <input
+            type="text"
+            placeholder="Buscar por nombre"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="search-input"
+          />
+          <FontAwesomeIcon icon={faSearch} className="search-icon" />
+        </div>
       </div>
 
       <div className="reclamos-list">
@@ -171,8 +219,50 @@ const Reclamos = ({ token, onLogout }) => {
               <p>Estado: {reclamo.estado}</p>
               <p>Producto: {reclamo.producto}</p>
               <p>Asignado: {reclamo.asignado || "No asignado"}</p>
-              <p>Importancia: {reclamo.importancia}</p>            
-              <p>Imp: {reclamo.observaciones}</p>  
+              <p>Importancia: {reclamo.importancia}</p>
+              <div className="observaciones-container">
+                <p>
+                  Observaciones:{" "}
+                  <span>
+                    {editingObservaciones === reclamo.id ? (
+                      <div className="edit-observaciones">
+                        <textarea
+                          value={tempObservaciones}
+                          onChange={(e) => setTempObservaciones(e.target.value)}
+                          className="observaciones-textarea"
+                        />
+                        <div className="observaciones-edit-buttons">
+                          <button
+                            onClick={() => updateObservaciones(reclamo.id)}
+                            className="save-button"
+                          >
+                            <FontAwesomeIcon icon={faSave} /> Guardar
+                          </button>
+                          <button
+                            onClick={cancelEditObservaciones}
+                            className="cancel-button"
+                          >
+                            <FontAwesomeIcon icon={faTimes} /> Cancelar
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        {reclamo.observaciones}
+                        {(reclamo.estado === "en proceso" ||
+                          reclamo.estado === "finalizado") && (
+                          <button
+                            onClick={() => startEditObservaciones(reclamo)}
+                            className="edit-observaciones-button"
+                          >
+                            <FontAwesomeIcon icon={faEdit} />
+                          </button>
+                        )}
+                      </>
+                    )}
+                  </span>
+                </p>
+              </div>
               <p>{reclamo.descripcion}</p>
               <p>
                 Fecha:{" "}
