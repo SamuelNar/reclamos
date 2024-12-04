@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API = axios.create({
-  baseURL: 'reclamos-production-2298.up.railway.app',
+  baseURL: 'https://reclamos-production-2298.up.railway.app/',
 });
 
 API.interceptors.request.use((config) => {
