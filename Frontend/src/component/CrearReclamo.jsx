@@ -1,6 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect} from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import API from '../utils/api';
 import "./crearReclamo.css";
 
 function CrearReclamo() {
@@ -17,12 +16,39 @@ function CrearReclamo() {
     estado: reclamo?.estado || "",
     observaciones: reclamo?.observaciones || "Ingrese observaciones",
     asignado: reclamo?.asignado || "",
+    clienteId: reclamo?.clienteId || "",
   });
 
+  const [clientes, setClientes] = useState([]); // Lista de clientes
   const [descripcionOpciones, setDescripcionOpciones] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+
+  useEffect(() => {
+    const fetchClientes = async () => {
+      try {
+        const response = await fetch(
+          "https://reclamos-production-2298.up.railway.app/clientes",
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+        if (!response.ok) {
+          throw new Error("Error al obtener la lista de clientes");
+        }
+        const data = await response.json();
+        setClientes(data); // Suponiendo que el API devuelve un arreglo de clientes
+      } catch (error) {
+        setError("No se pudo cargar la lista de clientes.",error);
+      }
+    };
+
+    fetchClientes();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -103,14 +129,19 @@ function CrearReclamo() {
           {reclamo ? "Editar Reclamo" : "Crear Reclamo"}
         </h2>
         <form onSubmit={handleSubmit} className="form_reclamos_create">
-          <input
-            name="nombre"
-            placeholder="Nombre"
-            value={formData.nombre}
+        <select
+            name="clienteId"
+            value={formData.clienteId}
             onChange={handleChange}
             required
-          />
-
+          >
+            <option value="">Seleccionar Cliente</option>
+            {clientes.map((cliente) => (
+              <option key={cliente.id} value={cliente.id}>
+                {cliente.nombre}
+              </option>
+            ))}
+          </select>
           <select
             name="producto"
             value={formData.producto}

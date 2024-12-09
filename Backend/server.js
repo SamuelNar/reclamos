@@ -21,6 +21,13 @@ const db = mysql.createPool({
   database: "control",
 });
 
+const clientesDb = mysql.createPool({
+  host: "mysqlspring.cve2cg4quyaq.sa-east-1.rds.amazonaws.com",
+  user: "lidercom",
+  password: "123lidercom456",
+  database: "clientes",
+});
+
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers.authorization;
   const token = authHeader && authHeader.split(" ")[1];
@@ -109,33 +116,57 @@ app.get("/reclamos", async (req, res) => {
   }
 });
 
+app.get("/clientes", async (req, res) => {
+  try {
+    const [rows] = await clientesDb.query("SELECT * FROM cliente");
+    res.status(200).json(rows);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "Error al obtener clientes", details: error.message });
+  }
+});
+
 app.post("/reclamos", authenticateToken, async (req, res) => {
   const { 
     nombre, 
     producto, 
-    productoPersonalizado,
+    productoPersonalizado, 
     descripcion, 
-    descripcionPersonalizada,
-    importancia,
+    descripcionPersonalizada, 
+    importancia, 
     observaciones, 
     estado, 
-    asignado 
+    asignado, 
+    cliente_id 
   } = req.body;
 
-  const finalProducto = producto === 'otros' ? productoPersonalizado : producto;
-  
-  // Usar descripcionPersonalizada si descripcion es "otros"
-  const finalDescripcion = descripcion === 'otros' ? descripcionPersonalizada : descripcion;
-  if (!nombre || !finalProducto || !finalDescripcion || !importancia || !estado || !asignado) {
+  // Validar campos obligatorios
+  const finalProducto = producto === "otros" ? productoPersonalizado : producto;
+  const finalDescripcion = descripcion === "otros" ? descripcionPersonalizada : descripcion;
+
+  if (
+    !nombre || 
+    !finalProducto || 
+    !finalDescripcion || 
+    !importancia || 
+    !estado || 
+    !asignado || 
+    !cliente_id
+  ) {
     return res.status(400).json({ error: "Faltan campos obligatorios" });
   }
 
   try {
+    // Insertar el reclamo en la base de datos
     const [result] = await db.query(
-      "INSERT INTO reclamos (nombre, producto, descripcion, importancia,observaciones, estado, asignado) VALUES (?, ?, ?, ?, ?, ?,?)",
-      [nombre, finalProducto, finalDescripcion, importancia, observaciones,estado, asignado]
+      `INSERT INTO reclamos (
+        nombre, producto, descripcion, importancia, observaciones, estado, asignado, cliente_id
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [nombre, finalProducto, finalDescripcion, importancia, observaciones, estado, asignado, cliente_id]
     );
 
+    // Responder con el nuevo reclamo creado
     res.status(201).json({
       id: result.insertId,
       nombre,
@@ -144,15 +175,15 @@ app.post("/reclamos", authenticateToken, async (req, res) => {
       importancia,
       observaciones,
       estado,
-      asignado
+      asignado,
+      cliente_id
     });
   } catch (error) {
     console.error("Error al crear reclamo:", error);
-    res
-      .status(500)
-      .json({ error: "Error al crear reclamo", details: error.message });
+    res.status(500).json({ error: "Error al crear reclamo", details: error.message });
   }
 });
+
 
 app.put("/reclamos/:id", authenticateToken, async (req, res) => {
   const { id } = req.params;  // Obtener el ID de los parámetros de la URL
@@ -165,7 +196,8 @@ app.put("/reclamos/:id", authenticateToken, async (req, res) => {
     importancia, 
     observaciones,
     estado, 
-    asignado 
+    asignado,
+    cliente_id 
   } = req.body;
 
   const finalProducto = producto === 'otros' ? productoPersonalizado : producto;
@@ -179,8 +211,8 @@ app.put("/reclamos/:id", authenticateToken, async (req, res) => {
 
   try {
     const [result] = await db.query(
-      "UPDATE reclamos SET nombre = ?, producto = ?, descripcion = ?, importancia = ?, observaciones = ?, estado = ?, asignado = ? WHERE id = ?",
-      [nombre, finalProducto, finalDescripcion, importancia, observaciones,estado, asignado, id]
+      "UPDATE reclamos SET nombre = ?, producto = ?, descripcion = ?, importancia = ?, observaciones = ?, estado = ?, asignado = ?, cliente_id = ? WHERE id = ?",
+      [nombre, finalProducto, finalDescripcion, importancia, observaciones,estado, asignado,cliente_id,id]
     );
 
     // Verificar si se actualizó algún registro
