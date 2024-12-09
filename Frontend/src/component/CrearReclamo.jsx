@@ -36,7 +36,7 @@ function CrearReclamo() {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
             },
           }
-        );
+        );        
         if (!response.ok) {
           throw new Error("Error al obtener la lista de clientes");
         }
