@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import SignatureCanvas from "react-signature-canvas";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faSyncAlt,
@@ -21,6 +22,8 @@ const Reclamos = ({ token, onLogout }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [editingObservaciones, setEditingObservaciones] = useState(null);
   const [tempObservaciones, setTempObservaciones] = useState("");
+  const [signatures, setSignatures] = useState({}); // Para almacenar firmas por reclamo
+  const signaturePads = useRef({});  // Referencias para cada firma
   const navigate = useNavigate();
 
   const handleLogout = useCallback(async () => {
@@ -164,6 +167,22 @@ const Reclamos = ({ token, onLogout }) => {
     return true;
   });
 
+  const saveSignature = (id) => {
+    const signatureData = signaturePads.current[id].toDataURL();
+    setSignatures((prev) => ({
+      ...prev,
+      [id]: signatureData,  
+    }));
+  };
+
+  const clearSignature = (id) => {
+    signaturePads.current[id].clear();
+    setSignatures((prev) => ({
+      ...prev,
+      [id]: null,  // Resetea la firma guardada para el reclamo
+    }));
+  };
+
   return (
     <div className="reclamos-container">
       <div className="header">
@@ -219,7 +238,7 @@ const Reclamos = ({ token, onLogout }) => {
               <p>Estado: {reclamo.estado}</p>
               <p>Producto: {reclamo.producto}</p>
               <p>Asignado: {reclamo.asignado || "No asignado"}</p>
-              <p>Importancia: {reclamo.importancia}</p>
+              <p>Importancia: {reclamo.importancia}</p>          
               <div className="observaciones-container">
                 <p>
                   Observaciones:{" "}
@@ -278,6 +297,34 @@ const Reclamos = ({ token, onLogout }) => {
                     <FontAwesomeIcon icon={faSyncAlt} /> Cambiar Estado
                   </button>
                 )}
+                 {
+                reclamo.estado === "finalizado" && (
+                  <div className="signature-container">
+                  <h3>Firma Virtual</h3>
+                  <SignatureCanvas
+                    ref={(ref) => (signaturePads.current[reclamo.id] = ref)}
+                    backgroundColor="white"
+                    penColor="black"
+                    canvasWidth={500}
+                    canvasHeight={200}
+                  />
+                  <div className="signature-buttons">
+                    <button onClick={() => saveSignature(reclamo.id)}>
+                      Guardar Firma
+                    </button>
+                    <button onClick={() => clearSignature(reclamo.id)}>
+                      Limpiar Firma
+                    </button>
+                  </div>
+                  {signatures[reclamo.id] && (
+                    <div className="signature-preview">
+                      <h4>Firma Guardada:</h4>
+                      <img src={signatures[reclamo.id]} alt="Firma" />
+                    </div>
+                  )}
+                </div>
+                )
+              }
                 {role === "admin" && (
                   <div className="reclamo-actions">
                     <button onClick={() => deleteReclamo(reclamo.id)}>

@@ -342,3 +342,123 @@
     gap: 10px;
   }
 }
+
+
+/* Estilos generales para la sección de firma */
+.signature-container {
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  padding: 20px;
+  margin: 20px 0;
+  background-color: #f9f9f9;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.signature-container h3 {
+  font-size: 1.2em;
+  color: #333;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.signature-container .signature-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+
+.signature-container .signature-buttons button {
+  padding: 8px 15px;
+  font-size: 0.9em;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.signature-container .signature-buttons button:hover {
+  background-color: #007bff;
+  color: white;
+}
+
+.signature-container .signature-preview {
+  margin-top: 15px;
+  text-align: center;
+}
+
+.signature-container .signature-preview img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+}
+
+.signature-container .signature-preview h4 {
+  font-size: 1.1em;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+/* Estilos del área de la firma */
+.signature-container canvas {
+  border: 2px solid #bbb;
+  border-radius: 5px;
+  background-color: #fff;
+  margin-bottom: 10px;
+}
+
+/* Estilo para los botones dentro de la sección de observaciones */
+.edit-observaciones-button,
+.save-button,
+.cancel-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9em;
+  transition: background-color 0.3s ease;
+}
+
+.edit-observaciones-button:hover,
+.save-button:hover,
+.cancel-button:hover {
+  background-color: #0056b3;
+}
+
+.edit-observaciones-button {
+  margin-left: 10px;
+}
+
+.save-button {
+  background-color: #28a745;
+}
+
+.cancel-button {
+  background-color: #dc3545;
+}
+
+.save-button:hover {
+  background-color: #218838;
+}
+
+.cancel-button:hover {
+  background-color: #c82333;
+}
+
+/* Botón de limpiar firma */
+.clear-signature-button {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  font-size: 0.9em;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.clear-signature-button:hover {
+  background-color: #c82333;
+}

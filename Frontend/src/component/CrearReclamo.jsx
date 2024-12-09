@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import API from '../utils/api';
 import "./crearReclamo.css";
 
 function CrearReclamo() {
@@ -63,8 +64,8 @@ function CrearReclamo() {
       const token = localStorage.getItem("token");
       const method = reclamo ? "PUT" : "POST";
       const endpoint = reclamo
-        ? `http://localhost:3000/reclamos/${reclamo.id}`
-        : "http://localhost:3000/reclamos";
+        ? `https://reclamos-production-2298.up.railway.app/reclamos/${reclamo.id}`
+        : "https://reclamos-production-2298.up.railway.app/reclamos";
       const response = await fetch(endpoint, {
         method,
         headers: {
