@@ -204,9 +204,18 @@ app.put("/reclamos/:id", authenticateToken, async (req, res) => {
   
   // Usar descripcionPersonalizada si descripcion es "otros"
   const finalDescripcion = descripcion === 'otros' ? descripcionPersonalizada : descripcion;
-
+  console.log(nombre, 
+    producto, 
+    productoPersonalizado,
+    descripcion, 
+    descripcionPersonalizada,
+    importancia, 
+    observaciones,
+    estado, 
+    asignado,
+    cliente_id )
   if (!nombre || !finalProducto || !finalDescripcion || !importancia || !estado || !asignado) {
-    return res.status(400).json({ error: "Faltan campos obligatorios" });
+    return res.status(401).json({ error: "Faltan campos obligatorios" });
   }
 
   try {

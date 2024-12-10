@@ -1,6 +1,7 @@
 import { useState, useEffect} from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "./crearReclamo.css";
+import BuscadorCliente from "./BuscadorCliente";
 
 function CrearReclamo() {
   const navigate = useNavigate();
@@ -72,7 +73,7 @@ function CrearReclamo() {
     setLoading(true);
     setError("");
     setSuccess("");
-
+  
     const reclamoData = {
       ...formData,
       producto:
@@ -83,9 +84,9 @@ function CrearReclamo() {
         formData.descripcion === "otros"
           ? formData.descripcionPersonalizada
           : formData.descripcion,
-      observaciones: "Ingrese observaciones",
+      observaciones: formData.observaciones || "Ingrese observaciones",
     };
-
+  
     try {
       const token = localStorage.getItem("token");
       const method = reclamo ? "PUT" : "POST";
@@ -100,23 +101,27 @@ function CrearReclamo() {
         },
         body: JSON.stringify(reclamoData),
       });
-
+      console.log("Respuesta del servidor:", response);
+      
       if (!response.ok) {
         const errorData = await response.json();
+        console.error("Error del servidor:", errorData);
         throw new Error(errorData.error || "Error al procesar el reclamo");
       }
-
+  
+      // Éxito: Mostrar mensaje y redirigir
       setSuccess(
         reclamo ? "Reclamo actualizado con éxito" : "Reclamo creado con éxito"
       );
       setTimeout(() => navigate("/"), 1000);
     } catch (error) {
+      // Mostrar error detallado
       setError(error.message || "Hubo un problema al procesar el reclamo");
     } finally {
       setLoading(false);
     }
   };
-
+  
   const handleHome = () => {
     navigate("/");
   }
@@ -128,20 +133,12 @@ function CrearReclamo() {
         <h2 className="text_reclamos">
           {reclamo ? "Editar Reclamo" : "Crear Reclamo"}
         </h2>
-        <form onSubmit={handleSubmit} className="form_reclamos_create">
-        <select
-            name="clienteId"
-            value={formData.clienteId}
-            onChange={handleChange}
-            required
-          >
-            <option value="">Seleccionar Cliente</option>
-            {clientes.map((cliente) => (
-              <option key={cliente.id} value={cliente.id}>
-                {cliente.nombre}
-              </option>
-            ))}
-          </select>
+        <form onSubmit={handleSubmit} className="form_reclamos_create">          
+        <BuscadorCliente
+            clientes={clientes}
+            formData={formData}
+            setFormData={setFormData}
+          />
           <select
             name="producto"
             value={formData.producto}
