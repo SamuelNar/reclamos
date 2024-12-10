@@ -17,7 +17,7 @@ function CrearReclamo() {
     estado: reclamo?.estado || "",
     observaciones: reclamo?.observaciones || "Ingrese observaciones",
     asignado: reclamo?.asignado || "",
-    clienteId: reclamo?.clienteId || "",
+    cliente_id: reclamo?.cliente_id || "",
   });
 
   const [clientes, setClientes] = useState([]); // Lista de clientes
@@ -101,8 +101,6 @@ function CrearReclamo() {
         },
         body: JSON.stringify(reclamoData),
       });
-      console.log("Respuesta del servidor:", response);
-      
       if (!response.ok) {
         const errorData = await response.json();
         console.error("Error del servidor:", errorData);

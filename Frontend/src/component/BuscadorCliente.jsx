@@ -9,11 +9,11 @@ function BuscadorCliente({ clientes, formData, setFormData }) {
       setSearchTerm(e.target.value.toLowerCase());
     };
   
-    const handleSelect = (clienteId, clienteNombre) => {
-      setFormData({ ...formData, clienteId,nombre: clienteNombre});
+    const handleSelect = (cliente_id, clienteNombre) => {
+      setFormData({ ...formData, cliente_id: cliente_id, nombre: clienteNombre }); // Ajusta 'cliente_id' en lugar de 'clienteId'
       setSearchTerm(clienteNombre); // Muestra el nombre seleccionado en el buscador
       setIsOpen(false);
-      console.log(clienteId);
+      console.log(cliente_id);
       console.log(clienteNombre);
       console.log(formData);
     };
