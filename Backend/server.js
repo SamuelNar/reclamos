@@ -145,6 +145,17 @@ app.post("/reclamos", authenticateToken, async (req, res) => {
   const finalProducto = producto === "otros" ? productoPersonalizado : producto;
   const finalDescripcion = descripcion === "otros" ? descripcionPersonalizada : descripcion;
 
+  console.log(nombre, 
+    producto, 
+    productoPersonalizado, 
+    descripcion, 
+    descripcionPersonalizada, 
+    importancia, 
+    observaciones, 
+    estado, 
+    asignado, 
+    cliente_id )
+    
   if (
     !nombre || 
     !finalProducto || 
