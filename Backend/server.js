@@ -317,9 +317,6 @@ app.patch("/reclamos/:id/estado", async (req, res) => {
   }
 });
 
-// Importar el módulo fs
-import fs from "fs";
-
 // Agregar firma al reclamo
 app.put("/reclamos/:id/firma", async (req, res) => {
   const { firma } = req.body; // Firma en formato base64
