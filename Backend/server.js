@@ -4,6 +4,7 @@ import mysql from "mysql2/promise";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import cors from "cors";
+import fs from "fs";
 
 // Configuración
 const app = express();
@@ -312,6 +313,49 @@ app.patch("/reclamos/:id/estado", async (req, res) => {
     res.status(500).json({ 
       error: "Error al actualizar el estado del reclamo", 
       details: error.message 
+    });
+  }
+});
+
+// Importar el módulo fs
+import fs from "fs";
+
+// Agregar firma al reclamo
+app.put("/reclamos/:id/firma", async (req, res) => {
+  const { firma } = req.body; // Firma en formato base64
+  const reclamoId = req.params.id;
+
+  if (!firma) {
+    return res.status(400).json({ error: "Firma es requerida" });
+  }
+
+  try {
+    // Convertir la firma base64 a un archivo
+    const base64Data = firma.replace(/^data:image\/png;base64,/, "");
+    const filePath = `firmas/reclamo_${reclamoId}.png`;
+
+    // Guardar la firma como un archivo en el sistema de archivos
+    fs.writeFileSync(filePath, base64Data, "base64");
+
+    // Actualizar la base de datos con la ruta de la firma
+    const [result] = await db.query(
+      "UPDATE reclamos SET firma = ? WHERE id = ?",
+      [filePath, reclamoId]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "Reclamo no encontrado" });
+    }
+
+    res.status(200).json({
+      message: "Firma actualizada exitosamente",
+      filePath,
+    });
+  } catch (error) {
+    console.error("Error al guardar la firma:", error);
+    res.status(500).json({
+      error: "Error al guardar la firma",
+      details: error.message,
     });
   }
 });

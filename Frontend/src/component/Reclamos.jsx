@@ -105,6 +105,11 @@ const Reclamos = ({ token, onLogout }) => {
       "en proceso": "finalizado",
     };
     const newStatus = statusProgression[currentStatus] || "inactivo";
+    if (newStatus === "finalizado" && !signatures[id]) {
+      alert("Debe firmar antes de finalizar el reclamo.");
+      return;
+    }
+    
     try {
       await API.patch(
         `/reclamos/${id}/estado`,
@@ -167,12 +172,25 @@ const Reclamos = ({ token, onLogout }) => {
     return true;
   });
 
-  const saveSignature = (id) => {
-    const signatureData = signaturePads.current[id].toDataURL();
-    setSignatures((prev) => ({
-      ...prev,
-      [id]: signatureData,  
-    }));
+  const saveSignature = async (id) => {
+    try {
+      const signatureData = signaturePads.current[id].toDataURL();
+      await API.put(
+        `/reclamos/${id}/firma`,
+        { firma: signatureData },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setSignatures((prev) => ({
+        ...prev,
+        [id]: signatureData,
+      }));
+    } catch (err) {
+      console.error("Error saving signature:", err);
+    }
   };
 
   const clearSignature = (id) => {
@@ -297,8 +315,9 @@ const Reclamos = ({ token, onLogout }) => {
                     <FontAwesomeIcon icon={faSyncAlt} /> Cambiar Estado
                   </button>
                 )}
+
                  {
-                reclamo.estado === "finalizado" && (
+                reclamo.estado === "en proceso" && (
                   <div className="signature-container">
                   <h3>Firma Virtual</h3>
                   <SignatureCanvas
