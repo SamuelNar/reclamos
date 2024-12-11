@@ -342,8 +342,6 @@
     gap: 10px;
   }
 }
-
-
 /* Estilos generales para la sección de firma */
 .signature-container {
   border: 2px solid #ccc;
@@ -406,6 +404,68 @@
   background-color: #fff;
   margin-bottom: 10px;
 }
+
+/* Estilos responsivos para pantallas más pequeñas */
+@media (max-width: 768px) {
+  /* Ajustar el tamaño del contenedor */
+  .signature-container {
+    padding: 15px;
+    margin: 10px;
+  }
+
+  /* Ajustar el tamaño de los botones */
+  .signature-container .signature-buttons button {
+    padding: 10px;
+    font-size: 1em;
+    width: 48%;
+    margin: 0 1%;
+  }
+
+  /* Ajustar el tamaño del lienzo */
+  .signature-container canvas {
+    width: 100%;
+    height: 150px;
+  }
+
+  /* Ajustar el tamaño del título */
+  .signature-container h3 {
+    font-size: 1.1em;
+  }
+
+  /* Ajustar el tamaño de la vista previa de la firma */
+  .signature-container .signature-preview img {
+    max-width: 90%;
+  }
+}
+
+/* Estilos para pantallas muy pequeñas (móviles) */
+@media (max-width: 480px) {
+  /* Ajustar el contenedor */
+  .signature-container {
+    padding: 10px;
+    margin: 5px;
+  }
+
+  /* Ajustar el tamaño de los botones */
+  .signature-container .signature-buttons button {
+    padding: 8px;
+    font-size: 0.9em;
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  /* Ajustar el tamaño del lienzo */
+  .signature-container canvas {
+    width: 100%;
+    height: 130px;
+  }
+
+  /* Ajustar el tamaño del título */
+  .signature-container h3 {
+    font-size: 1em;
+  }
+}
+
 
 /* Estilo para los botones dentro de la sección de observaciones */
 .edit-observaciones-button,

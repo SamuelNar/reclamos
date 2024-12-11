@@ -333,11 +333,11 @@ app.put("/reclamos/:id/firma", async (req, res) => {
     }
     // Convertir la firma base64 a un archivo
     const base64Data = firma.replace(/^data:image\/png;base64,/, "");
-    const filePath = `firmas/reclamo_${reclamoId}.png`;
+    const filePath = `${directory}/reclamo_${reclamoId}.png`;
 
     // Guardar la firma como un archivo en el sistema de archivos
     fs.writeFileSync(filePath, base64Data, "base64");
-
+    console.log('Archivo guardado en:', filePath);
     // Actualizar la base de datos con la ruta de la firma
     const [result] = await db.query(
       "UPDATE reclamos SET firma = ? WHERE id = ?",
