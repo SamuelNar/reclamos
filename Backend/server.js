@@ -327,6 +327,10 @@ app.put("/reclamos/:id/firma", async (req, res) => {
   }
 
   try {
+    const directory = "firmas";
+    if (!fs.existsSync(directory)) {
+      fs.mkdirSync(directory, { recursive: true });
+    }
     // Convertir la firma base64 a un archivo
     const base64Data = firma.replace(/^data:image\/png;base64,/, "");
     const filePath = `firmas/reclamo_${reclamoId}.png`;
