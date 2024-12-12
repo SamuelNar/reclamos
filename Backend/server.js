@@ -42,7 +42,7 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
-app.patch("/chagePassword"), async (req,res) => {
+app.patch("/changePassword", async (req, res) => {
   const { password } = req.body;
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -50,11 +50,12 @@ app.patch("/chagePassword"), async (req,res) => {
       "UPDATE usuarios SET password = ? WHERE id = ?",
       [hashedPassword, req.user.id]
     );
-    res.status(200).json({ message: "Contraseña cambiada con exito" });
-  }catch (error) {
-    res.status(500).json({ error: "Error al cambiar la contraseña", details: error.message });
+    res.status(200).json({ message: "Contraseña cambiada con éxito" });
+  } catch (error) {
+    res.status(500).json({ error: "Error al cambiar la contraseña", details: error.message });
   }
-}
+});
+
 
 // Rutas de autenticación
 app.post("/auth/register", async (req, res) => {

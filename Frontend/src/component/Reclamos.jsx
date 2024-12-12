@@ -220,7 +220,7 @@ const Reclamos = ({ token, onLogout }) => {
   const changePassword = async () => {    
     try {
       await API.patch(
-        "/chagePassword",
+        "/changePassword",
         { password: newPassword },
         {
           headers: {
@@ -258,6 +258,7 @@ const Reclamos = ({ token, onLogout }) => {
       </div>
     );
   }
+
   return (
       <div className="reclamos-container">
       <div className="header">
