@@ -219,8 +219,8 @@ const Reclamos = ({ token, onLogout }) => {
 
   const changePassword = async () => {    
     try {
-      await API.put(
-        "/changePassword",
+      await API.patch(
+        "/chagePassword",
         { password: newPassword },
         {
           headers: {

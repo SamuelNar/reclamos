@@ -42,8 +42,7 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
-
-app.put("/chagePassword"), async (req,res) => {
+app.patch("/chagePassword"), async (req,res) => {
   const { password } = req.body;
   try {
     const hashedPassword = await bcrypt.hash(password, 10);

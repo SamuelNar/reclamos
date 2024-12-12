@@ -25,19 +25,19 @@ function App() {
       />
       <Route
         path="/"
-        element={token ? <Reclamos token={token} onLogout={handleLogout} />: <Login onLogin={handleLogin} />}
+        element={<Reclamos token={token} onLogout={handleLogout} />}
       />     
       <Route
         path="/reclamos"
-        element={token ?<Reclamos token={token} onLogout={handleLogout} />: <Login onLogin={handleLogin} />}
+        element={<Reclamos token={token} onLogout={handleLogout} />}
       />
       <Route
         path="/reclamos/:id"
-        element={token ? <CrearReclamo /> : <Login onLogin={handleLogin} />}
+        element={ <CrearReclamo /> }
       />
       <Route
         path="/crear"
-        element={token ? <CrearReclamo /> : <Login onLogin={handleLogin} />}
+        element={<CrearReclamo /> }
       />
     </Routes>
   );

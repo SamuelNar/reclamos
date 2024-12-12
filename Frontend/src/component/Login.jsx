@@ -12,14 +12,12 @@ const Login = ({ onLogin }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    
+    setError('');  
     try {
       const response = await API.post('/auth/login', { 
         username, 
         password 
-      });
-      
+      });      
       if (response.data && response.data.token) {
         localStorage.setItem('token', response.data.token);
         onLogin(response.data.token);
