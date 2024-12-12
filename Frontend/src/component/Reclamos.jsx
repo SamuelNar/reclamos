@@ -21,6 +21,8 @@ const Reclamos = ({ token, onLogout }) => {
   const [selectedStatus, setSelectedStatus] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [editingObservaciones, setEditingObservaciones] = useState(null);
+  const [newPassword, setNewPassword] = useState("");
+  const [isPasswordChanged, setIsPasswordChanged] = useState(false);
   const [tempObservaciones, setTempObservaciones] = useState("");
   const [signatures, setSignatures] = useState({}); // Para almacenar firmas por reclamo
   const signaturePads = useRef({});  // Referencias para cada firma
@@ -71,15 +73,6 @@ const Reclamos = ({ token, onLogout }) => {
       }
     }
   }, [token, handleLogout]);
-
-  useEffect(() => {
-    fetchReclamos();
-    if (token) {
-      fetchRole();
-    } else {
-      setRole("");
-    }
-  }, [token, fetchReclamos, fetchRole]);
 
   const deleteReclamo = async (id) => {
     try {
@@ -201,8 +194,72 @@ const Reclamos = ({ token, onLogout }) => {
     }));
   };
 
+  const checkPasswordChange = useCallback(() => {
+    if (token) {
+      try {
+        // eslint-disable-next-line react/prop-types
+        const decodedToken = JSON.parse(atob(token.split(".")[1]));
+        if (decodedToken?.rol) {
+          setRole(decodedToken.rol);
+        } else {
+          throw new Error("Rol no encontrado en el token");
+        }
+
+        if (decodedToken?.password === "123123") {
+          setIsPasswordChanged(false); 
+        } else {
+          setIsPasswordChanged(true);
+        }
+      } catch (error) {
+        console.error("Error decoding token:", error);
+        onLogout();
+      }
+    }
+  }, [token, onLogout]);
+
+  const changePassword = async () => {    
+    try {
+      await API.put(
+        "/changePassword",
+        { password: newPassword },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );      
+      setIsPasswordChanged(true); 
+    } catch (err) {
+      console.error("Error changing password:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchReclamos();
+    checkPasswordChange();
+    if (token) {
+      fetchRole();
+    } else {
+      setRole("");
+    }
+  }, [token, fetchReclamos, fetchRole,checkPasswordChange]);
+
+  if (!isPasswordChanged) {
+    return (
+      <div className="change-password-container">
+        <h2>Por favor, cambia tu contraseña</h2>
+        <input
+          type="password"
+          placeholder="Nueva contraseña"
+          value={newPassword}
+          onChange={(e) => setNewPassword(e.target.value)}
+        />
+        <button onClick={changePassword}>Cambiar Contraseña</button>
+      </div>
+    );
+  }
   return (
-    <div className="reclamos-container">
+      <div className="reclamos-container">
       <div className="header">
         <h1>Reclamos</h1>
         {token ? (
