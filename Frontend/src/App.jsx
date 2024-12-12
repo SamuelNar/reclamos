@@ -1,8 +1,14 @@
 import { useState } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Login from './component/Login';
 import Reclamos from './component/Reclamos';
 import CrearReclamo from './component/CrearReclamo';
+
+// Componente de ruta protegida
+// eslint-disable-next-line react/prop-types
+const ProtectedRoute = ({ token, children }) => {
+  return token ? children : <Navigate to="/login" replace />;
+};
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem("token") || null);
@@ -19,25 +25,54 @@ function App() {
 
   return (
     <Routes>
-       <Route
+      <Route
         path="/login"
         element={<Login onLogin={handleLogin} />}
       />
       <Route
         path="/"
-        element={token ? <Reclamos token={token} onLogout={handleLogout} /> : <Login onLogin={handleLogin} />}
+        element={
+          <ProtectedRoute token={token}>
+            <Reclamos token={token} onLogout={handleLogout} />
+          </ProtectedRoute>
+        }
       />     
       <Route
         path="/reclamos"
-        element={token ?<Reclamos token={token} onLogout={handleLogout} />: <Login onLogin={handleLogin} />}
+        element={
+          <ProtectedRoute token={token}>
+            <Reclamos token={token} onLogout={handleLogout} />
+          </ProtectedRoute>
+        }
       />
       <Route
         path="/reclamos/:id"
-        element={token ? <CrearReclamo /> : <Login onLogin={handleLogin} />}
+        element={
+          <ProtectedRoute token={token}>
+            <CrearReclamo token={token} />
+          </ProtectedRoute>
+        }
       />
       <Route
         path="/crear"
-        element={token ? <CrearReclamo /> : <Login onLogin={handleLogin} />}
+        element={
+          <ProtectedRoute token={token}>
+            <CrearReclamo token={token} />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/change-password"
+        element={
+          <ProtectedRoute token={token}>
+            <ChangePas
+              token={token} 
+              onPasswordChanged={() => {
+                // Opcional: cualquier lógica después de cambiar la contraseña
+              }} 
+            />
+          </ProtectedRoute>
+        }
       />
     </Routes>
   );

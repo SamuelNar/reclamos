@@ -82,8 +82,7 @@ app.post("/auth/register", async (req, res) => {
 });
 
 app.post("/auth/login", async (req, res) => {
-  const { username, password } = req.body;
-  console.log(username, password);
+  const { username, password } = req.body;  
   try {
     const [rows] = await db.query("SELECT * FROM usuarios WHERE nombre = ?", [
       username,
@@ -98,7 +97,7 @@ app.post("/auth/login", async (req, res) => {
     if (!isPasswordValid) {
       return res.status(401).json({ error: "Contraseña incorrecta" });
     }
-
+    
     const token = jwt.sign(
       { id: user.id, username: user.username, rol: user.rol },
       SECRET_KEY,
