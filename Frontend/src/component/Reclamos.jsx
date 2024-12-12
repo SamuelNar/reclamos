@@ -195,7 +195,6 @@ const Reclamos = ({ token, onLogout }) => {
   };
 
   const checkPasswordChange = useCallback(() => {
-    if (token) {
       try {
         // eslint-disable-next-line react/prop-types
         const decodedToken = JSON.parse(atob(token.split(".")[1]));
@@ -214,7 +213,6 @@ const Reclamos = ({ token, onLogout }) => {
         console.error("Error decoding token:", error);
         onLogout();
       }
-    }
   }, [token, onLogout]);
 
   const changePassword = async () => {    

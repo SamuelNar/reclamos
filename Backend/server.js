@@ -83,7 +83,7 @@ app.post("/auth/register", async (req, res) => {
 
 app.post("/auth/login", async (req, res) => {
   const { username, password } = req.body;
-
+  console.log(username, password);
   try {
     const [rows] = await db.query("SELECT * FROM usuarios WHERE nombre = ?", [
       username,

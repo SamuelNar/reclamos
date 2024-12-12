@@ -13,7 +13,6 @@ const Login = ({ onLogin }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    
     try {
       const response = await API.post('/auth/login', { 
         username, 
