@@ -33,15 +33,8 @@ const Login = ({ onLogin }) => {
     }
   };
 
-  const handleHome = () => {
-    navigate("/");
-  }
-
   return (
-    <div className="login-container">
-      <div className='home_button_container'>
-        <button onClick={handleHome} className="home_button">Inicio</button>
-      </div>
+    <div className="login-container">      
       <form onSubmit={handleSubmit}>
         
         <h2>Iniciar Sesión</h2>
