@@ -18,13 +18,16 @@ const Login = ({ onLogin }) => {
       const response = await API.post('/auth/login', { 
         username, 
         password 
-      });            
+      });
+  
       if (response.data && response.data.token) {
         const decodedToken = JSON.parse(atob(response.data.token.split(".")[1]));
-        console.log("desde el login",decodedToken);
-        // Si necesita cambiar contraseña, redirigir
+        console.log("desde el login", decodedToken);
+  
+        // Si necesita cambiar contraseña, redirigir a /change-password/:id
         if (decodedToken?.password === "123123" || decodedToken?.first_login) {
-          navigate('/change-password');
+          // Redirigir a la ruta de cambio de contraseña con el ID
+          navigate(`/change-password/${decodedToken.id}`);
         } else {
           // Flujo normal
           localStorage.setItem('token', response.data.token);

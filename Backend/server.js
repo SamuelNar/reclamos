@@ -43,7 +43,7 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
-app.patch("/changePassword:id", async (req, res) => {
+app.patch("/changePassword/:id", async (req, res) => {
   const { id } = req.params;  
   console.log("Cuerpo de la solicitud:", req.params);
   const {password } = req.body;
