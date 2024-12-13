@@ -44,7 +44,7 @@ const authenticateToken = (req, res, next) => {
 
 app.patch("/changePassword", async (req, res) => {
   const { password } = req.body;
-
+  
   if (!password) {
     return res.status(400).json({ error: "La contraseña es requerida" });
   }
@@ -53,12 +53,7 @@ app.patch("/changePassword", async (req, res) => {
     return res.status(400).json({ error: "La contraseña debe tener al menos 6 caracteres" });
   }
 
-  try {
-
-    if (!req.user || !req.user.id) {
-      return res.status(401).json({ error: "Usuario no autenticado" });
-    }
-
+  try { 
     const hashedPassword = await bcrypt.hash(password, 10);
     const [result] = await db.query(
       "UPDATE usuarios SET password = ? WHERE id = ?",

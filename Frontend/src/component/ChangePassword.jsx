@@ -32,7 +32,7 @@ function ChangePassword({ token, setIsPasswordChanged }) {
       setIsPasswordChanged(true);
     } catch (error) {
       console.error("Error changing password:", error);    
-   
+      console.log(newPassword);
       if (error.response) {
         setError(
           error.response.data.error || 
