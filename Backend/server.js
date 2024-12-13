@@ -74,7 +74,6 @@ app.patch("/changePassword/:id", async (req, res) => {
   }
 });
 
-
 // Rutas de autenticación
 app.post("/auth/register", async (req, res) => {
   const { username, email,password, rol } = req.body;
@@ -152,6 +151,23 @@ app.get("/reclamos", async (req, res) => {
       .json({ error: "Error al obtener reclamos", details: error.message });
   }
 });
+
+app.get("/reclamos/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const [rows] = await db.query("SELECT * FROM reclamos WHERE id = ?", [id]);
+    if (rows.length === 0) {
+      return res.status(404).json({ error: "Reclamo no encontrado" });
+    }
+    res.status(200).json(rows[0]);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "Error al obtener reclamo", details: error.message });
+  }
+  }
+)
+
 
 app.get("/clientes", async (req, res) => {
   try {

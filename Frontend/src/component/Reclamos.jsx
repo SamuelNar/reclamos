@@ -473,6 +473,9 @@ const Reclamos = ({ token, onLogout }) => {
         )}
       </div>
 
+        
+
+
       {token && role === "admin" && (
         <button className="create-button" onClick={() => navigate("/crear")}>
           Crear Reclamo
