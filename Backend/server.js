@@ -43,9 +43,10 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
-app.patch("/changePassword", async (req, res) => {
-  console.log("Cuerpo de la solicitud:", req.body);
-  const {id, password } = req.body;
+app.patch("/changePassword:id", async (req, res) => {
+  const { id } = req.params;  
+  console.log("Cuerpo de la solicitud:", req.params);
+  const {password } = req.body;
   console.log("ID:", id, "Password:", password);
 
   if (!password) {
@@ -56,21 +57,7 @@ app.patch("/changePassword", async (req, res) => {
     return res.status(400).json({ error: "La contraseña debe tener al menos 6 caracteres" });
   }
 
-  try { 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const [result] = await db.query(
-      "UPDATE usuarios SET password = ? WHERE id = ?",
-      [hashedPassword,id]
-    );
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ error: "Usuario no encontrado" });
-    }
-
-    res.status(200).json({ message: "Contraseña cambiada con éxito" });    
-  } catch (error) {
-    console.error("Error detallado al cambiar contraseña:", error);
-    res.status(500).json({ error: "Error al cambiar la contraseña", details: error.message });
-  }
+  
 });
 
 

@@ -13,19 +13,19 @@ const ProtectedRoute = ({ token, children }) => {
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem("token") || null);
-  const [userId, setUserId] = useState(null);
-
-  const navigate = useNavigate();
+  const [userId, setUserId] = useState(localStorage.getItem("userId") || null);
+  const navigate = useNavigate();   
   const handleLogin = (newToken) => {
     setToken(newToken);
     localStorage.setItem("token", newToken);
     // Decodificar el token para verificar
     try {
-      const decodedToken = JSON.parse(atob(newToken.split(".")[1]));      
-      setUserId(decodedToken?.id)
+      const decodedToken = JSON.parse(atob(newToken.split(".")[1]));         
+      setUserId(decodedToken.id);    
+      localStorage.setItem("userId", userId);
       // Si la contraseña es 123123 o es primer login, redirigir a cambio de contraseña
       if (decodedToken?.password === "123123" || decodedToken?.first_login) {
-        navigate("/change-password");
+        navigate(`/change-password/${userId}`); 
       }
     } catch (error) {
       console.error("Error verificando token", error);
@@ -33,9 +33,11 @@ function App() {
   };
 
   const handleLogout = () => {
-    setToken(null);
+    setToken(null);    
     localStorage.removeItem("token");
+    localStorage.removeItem("userId");
   };
+
 
   return (
     <Routes>
@@ -76,18 +78,16 @@ function App() {
         }
       />
       <Route
-        path="/change-password"
-        element={         
-            <ChangePassword
-              token={token}
-              userId={userId}              
-              setIsPasswordChanged={(changed) => {
-                // Si el cambio de contraseña es exitoso, navegar al home
-                if (changed) {
-                  navigate("/");
-                }
-              }}
-            />     
+        path="/change-password/:id" // Parámetro de la URL
+        element={
+          <ChangePassword
+            token={token}
+            setIsPasswordChanged={(changed) => {
+              if (changed) {
+                navigate("/");
+              }
+            }}
+          />
         }
       />
     </Routes>

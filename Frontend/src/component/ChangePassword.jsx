@@ -1,27 +1,28 @@
 import { useState } from 'react';
+import { useParams } from 'react-router-dom'; 
 import API from "../utils/api";
 
-
 // eslint-disable-next-line react/prop-types
-function ChangePassword({ token, userId, setIsPasswordChanged }) {
+function ChangePassword({ token, setIsPasswordChanged }) {
+  const { id } = useParams(); 
   const [newPassword, setNewPassword] = useState('');
   const [error, setError] = useState(null);
 
   const changePassword = async () => {
-    // Validations
     if (!newPassword.trim()) {
       setError("La contraseña no puede estar vacía");
       return;
     }
-
+  
     if (newPassword.length < 6) {
       setError("La contraseña debe tener al menos 6 caracteres");
       return;
     }
-
+  
     try {
-      const response = await API.patch("/changePassword", 
-        { id: userId, password: newPassword },
+      const response = await API.patch(
+        `/changePassword/${id}`,  // El id ahora es parte de la URL
+        { password: newPassword }, // Solo enviamos la nueva contraseña en el cuerpo
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -29,28 +30,25 @@ function ChangePassword({ token, userId, setIsPasswordChanged }) {
           },
         }
       );
+      
       if (response.status === 200) {
         setError(null);
+        setIsPasswordChanged(true);
       }
-      setIsPasswordChanged(true);
     } catch (error) {
-      console.error("Error changing password:", error);    
-      console.log(newPassword);
-      if (error.response) {
-        setError(
-          error.response.data.error || 
-          error.response.data.message || 
-          "No se pudo cambiar la contraseña"
-        );
-      } else if (error.request) {
+      console.error("Error changing password:", error);
       
+      if (error.response) {
+        setError(error.response.data.error || "No se pudo cambiar la contraseña");
+      } else if (error.request) {
         setError("No se recibió respuesta del servidor");
-      } else {      
+      } else {
         setError("Error en la configuración de la solicitud");
       }
     }
   };
 
+  
   return (
     <div className="change-password-container">
       <div className="change-password-card">
