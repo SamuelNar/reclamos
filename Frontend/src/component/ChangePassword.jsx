@@ -1,46 +1,50 @@
 import { useState } from 'react';
+import API from "../utils/api";
 // eslint-disable-next-line react/prop-types
 function ChangePassword({ token, setIsPasswordChanged }) {
   const [newPassword, setNewPassword] = useState('');
   const [error, setError] = useState(null);
+
   const changePassword = async () => {
-    // Validar que la contraseña no esté vacía y cumpla requisitos
+    // Validations
     if (!newPassword.trim()) {
       setError("La contraseña no puede estar vacía");
       return;
     }
-  
-    // Opcional: Agregar validaciones de complejidad
+
     if (newPassword.length < 6) {
       setError("La contraseña debe tener al menos 6 caracteres");
       return;
     }
-  
+
     try {
-      const response = await fetch(
-        "https://reclamos-production-2298.up.railway.app/changePassword",
+      const response = await API.patch("/changePassword", 
+        { password: newPassword },
         {
-          method: "PUT",
           headers: {
-            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ password: newPassword }),
         }
       );
-  
-      if (response.ok) {
-        // Cuando se cambia con éxito
-        setIsPasswordChanged(true);
-        // Opcional: Navegar al home o mostrar mensaje de éxito
-      } else {
-        // Manejo de errores del servidor
-        const errorData = await response.json();
-        setError(errorData.message || "Error al cambiar la contraseña");
+      if (response.status === 200) {
+        setError(null);
       }
+      setIsPasswordChanged(true);
     } catch (error) {
-      console.error("Error changing password:", error);
-      setError("No se pudo conectar con el servidor");
+      console.error("Error changing password:", error);    
+   
+      if (error.response) {
+        setError(
+          error.response.data.error || 
+          error.response.data.message || 
+          "No se pudo cambiar la contraseña"
+        );
+      } else if (error.request) {
+      
+        setError("No se recibió respuesta del servidor");
+      } else {      
+        setError("Error en la configuración de la solicitud");
+      }
     }
   };
 
@@ -49,9 +53,9 @@ function ChangePassword({ token, setIsPasswordChanged }) {
       <div className="change-password-card">
         <h2>Cambio de Contraseña</h2>
         <p>Por seguridad, debe cambiar su contraseña predeterminada</p>
-        
+
         {error && <div className="error-message">{error}</div>}
-        
+
         <div className="form-group">
           <label htmlFor="newPassword">Nueva Contraseña</label>
           <input
@@ -63,7 +67,7 @@ function ChangePassword({ token, setIsPasswordChanged }) {
             className="password-input"
           />
         </div>
-        
+
         <div className="password-requirements">
           <p>La contraseña debe:</p>
           <ul>
@@ -72,9 +76,9 @@ function ChangePassword({ token, setIsPasswordChanged }) {
             <li>No ser una contraseña predeterminada</li>
           </ul>
         </div>
-        
-        <button 
-          onClick={changePassword} 
+
+        <button
+          onClick={changePassword}
           className="change-password-button"
           disabled={!newPassword.trim()}
         >

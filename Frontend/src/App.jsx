@@ -21,6 +21,8 @@ function App() {
     // Decodificar el token para verificar
     try {
       const decodedToken = JSON.parse(atob(newToken.split(".")[1]));
+      console.log(decodedToken);
+      console.log(decodedToken?.password);
 
       // Si la contraseña es 123123 o es primer login, redirigir a cambio de contraseña
       if (decodedToken?.password === "123123" || decodedToken?.first_login) {
@@ -76,8 +78,7 @@ function App() {
       />
       <Route
         path="/change-password"
-        element={
-          <ProtectedRoute token={token}>
+        element={         
             <ChangePassword
               token={token}
               setIsPasswordChanged={(changed) => {
@@ -86,8 +87,7 @@ function App() {
                   navigate("/");
                 }
               }}
-            />
-          </ProtectedRoute>
+            />     
         }
       />
     </Routes>

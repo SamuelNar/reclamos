@@ -18,11 +18,10 @@ const Login = ({ onLogin }) => {
       const response = await API.post('/auth/login', { 
         username, 
         password 
-      });
-      
+      });            
       if (response.data && response.data.token) {
         const decodedToken = JSON.parse(atob(response.data.token.split(".")[1]));
-        
+        console.log("desde el login",decodedToken);
         // Si necesita cambiar contraseña, redirigir
         if (decodedToken?.password === "123123" || decodedToken?.first_login) {
           navigate('/change-password');
