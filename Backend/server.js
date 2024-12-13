@@ -44,7 +44,7 @@ const authenticateToken = (req, res, next) => {
 
 app.patch("/changePassword", async (req, res) => {
   const { password } = req.body;
-  
+  console.log("Usuario autenticado:", req.user);
   if (!password) {
     return res.status(400).json({ error: "La contraseña es requerida" });
   }
