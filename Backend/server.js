@@ -43,8 +43,8 @@ const authenticateToken = (req, res, next) => {
 };
 
 app.patch("/changePassword", async (req, res) => {
-  const { password } = req.body;
-  console.log("Usuario autenticado:", req.user);
+  const { id,password } = req.body;
+  console.log("Usuario autenticado:",id);
   if (!password) {
     return res.status(400).json({ error: "La contraseña es requerida" });
   }
@@ -57,7 +57,7 @@ app.patch("/changePassword", async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const [result] = await db.query(
       "UPDATE usuarios SET password = ? WHERE id = ?",
-      [hashedPassword, req.user.id]
+      [hashedPassword,id]
     );
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: "Usuario no encontrado" });

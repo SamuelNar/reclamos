@@ -13,17 +13,16 @@ const ProtectedRoute = ({ token, children }) => {
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem("token") || null);
+  const [userId, setUserId] = useState(null);
+
   const navigate = useNavigate();
   const handleLogin = (newToken) => {
     setToken(newToken);
     localStorage.setItem("token", newToken);
-
     // Decodificar el token para verificar
     try {
-      const decodedToken = JSON.parse(atob(newToken.split(".")[1]));
-      console.log(decodedToken);
-      console.log(decodedToken?.password);
-
+      const decodedToken = JSON.parse(atob(newToken.split(".")[1]));      
+      setUserId(decodedToken?.id)
       // Si la contraseña es 123123 o es primer login, redirigir a cambio de contraseña
       if (decodedToken?.password === "123123" || decodedToken?.first_login) {
         navigate("/change-password");
@@ -81,6 +80,7 @@ function App() {
         element={         
             <ChangePassword
               token={token}
+              userId={userId}              
               setIsPasswordChanged={(changed) => {
                 // Si el cambio de contraseña es exitoso, navegar al home
                 if (changed) {

@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import API from "../utils/api";
+
+
 // eslint-disable-next-line react/prop-types
-function ChangePassword({ token, setIsPasswordChanged }) {
+function ChangePassword({ token, userId, setIsPasswordChanged }) {
   const [newPassword, setNewPassword] = useState('');
   const [error, setError] = useState(null);
 
@@ -19,7 +21,7 @@ function ChangePassword({ token, setIsPasswordChanged }) {
 
     try {
       const response = await API.patch("/changePassword", 
-        { password: newPassword },
+        { id: userId, password: newPassword },
         {
           headers: {
             Authorization: `Bearer ${token}`,
