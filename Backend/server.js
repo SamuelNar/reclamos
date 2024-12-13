@@ -14,6 +14,7 @@ const SECRET_KEY = "clave_secreta";
 app.use(cors());
 // Middleware
 app.use(bodyParser.json());
+app.use(express.json());
 
 const db = mysql.createPool({
   host: "mysqlspring.cve2cg4quyaq.sa-east-1.rds.amazonaws.com",
@@ -43,8 +44,10 @@ const authenticateToken = (req, res, next) => {
 };
 
 app.patch("/changePassword", async (req, res) => {
-  const { id,password } = req.body;
-  console.log("Usuario autenticado:",id);
+  console.log("Cuerpo de la solicitud:", req.body);
+  const {id, password } = req.body;
+  console.log("ID:", id, "Password:", password);
+
   if (!password) {
     return res.status(400).json({ error: "La contraseña es requerida" });
   }
