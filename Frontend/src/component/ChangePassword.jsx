@@ -20,6 +20,7 @@ function ChangePassword({ token, setIsPasswordChanged }) {
     }
   
     try {
+      console.log("Enviando solicitud para cambiar la contraseña..."); // Agregar log para depurar
       const response = await API.patch(
         `/changePassword/${id}`,  // El id ahora es parte de la URL
         { password: newPassword }, // Solo enviamos la nueva contraseña en el cuerpo
@@ -29,15 +30,19 @@ function ChangePassword({ token, setIsPasswordChanged }) {
             "Content-Type": "application/json",
           },
         }
-      );
-      
+      );    
+
+      console.log("Respuesta de la API:", response);  // Log de la respuesta de la API
+
       if (response.status === 200) {
         setError(null);
-        setIsPasswordChanged(true);
+        setIsPasswordChanged(true);  // Actualizar el estado
+        alert("Contraseña cambiada con éxito");  // Mostrar mensaje de éxito
+      } else {
+        setError("Error al cambiar la contraseña. Intente nuevamente.");
       }
     } catch (error) {
-      console.error("Error changing password:", error);
-      
+      console.error("Error al cambiar la contraseña:", error);
       if (error.response) {
         setError(error.response.data.error || "No se pudo cambiar la contraseña");
       } else if (error.request) {
@@ -48,7 +53,6 @@ function ChangePassword({ token, setIsPasswordChanged }) {
     }
   };
 
-  
   return (
     <div className="change-password-container">
       <div className="change-password-card">
