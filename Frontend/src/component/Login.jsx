@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import API from '../utils/api';
@@ -20,9 +21,17 @@ const Login = ({ onLogin }) => {
       });
       
       if (response.data && response.data.token) {
-        localStorage.setItem('token', response.data.token);
-        onLogin(response.data.token);
-        navigate('/');
+        const decodedToken = JSON.parse(atob(response.data.token.split(".")[1]));
+        
+        // Si necesita cambiar contraseña, redirigir
+        if (decodedToken?.password === "123123" || decodedToken?.first_login) {
+          navigate('/change-password');
+        } else {
+          // Flujo normal
+          localStorage.setItem('token', response.data.token);
+          onLogin(response.data.token);
+          navigate('/');
+        }
       } else {
         setError('Respuesta del servidor inesperada');
       }
@@ -35,7 +44,7 @@ const Login = ({ onLogin }) => {
   return (
     <div className="login-container">      
       <form onSubmit={handleSubmit}>
-        
+
         <h2>Iniciar Sesión</h2>
         <div className="form-group">
           <label htmlFor="username">Usuario</label>

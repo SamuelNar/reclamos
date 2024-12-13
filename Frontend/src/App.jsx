@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import Login from './component/Login';
 import Reclamos from './component/Reclamos';
 import CrearReclamo from './component/CrearReclamo';
+import ChangePassword from './component/ChangePassword';
 
 // Componente de ruta protegida
 // eslint-disable-next-line react/prop-types
@@ -12,10 +13,22 @@ const ProtectedRoute = ({ token, children }) => {
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem("token") || null);
-
+  const navigate = useNavigate();
   const handleLogin = (newToken) => {
     setToken(newToken);
     localStorage.setItem("token", newToken);
+
+    // Decodificar el token para verificar
+    try {
+      const decodedToken = JSON.parse(atob(newToken.split(".")[1]));
+
+      // Si la contraseña es 123123 o es primer login, redirigir a cambio de contraseña
+      if (decodedToken?.password === "123123" || decodedToken?.first_login) {
+        navigate("/change-password");
+      }
+    } catch (error) {
+      console.error("Error verificando token", error);
+    }
   };
 
   const handleLogout = () => {
@@ -36,7 +49,7 @@ function App() {
             <Reclamos token={token} onLogout={handleLogout} />
           </ProtectedRoute>
         }
-      />     
+      />
       <Route
         path="/reclamos"
         element={
@@ -65,11 +78,14 @@ function App() {
         path="/change-password"
         element={
           <ProtectedRoute token={token}>
-            <ChangePas
-              token={token} 
-              onPasswordChanged={() => {
-                // Opcional: cualquier lógica después de cambiar la contraseña
-              }} 
+            <ChangePassword
+              token={token}
+              setIsPasswordChanged={(changed) => {
+                // Si el cambio de contraseña es exitoso, navegar al home
+                if (changed) {
+                  navigate("/");
+                }
+              }}
             />
           </ProtectedRoute>
         }
