@@ -180,6 +180,19 @@ app.get("/clientes", async (req, res) => {
   }
 });
 
+app.get("/clientes/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const [rows] = await clientesDb.query("SELECT * FROM cliente WHERE id = ?", id);
+    res.status(200).json(rows);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "Error al obtener clientes", details: error.message });
+  }
+});
+
+
 app.post("/reclamos", authenticateToken, async (req, res) => {
   const { 
     nombre, 
