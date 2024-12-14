@@ -8,7 +8,7 @@ function CrearReclamo() {
   const location = useLocation();
   const reclamo = location.state?.reclamo || null;
   const [formData, setFormData] = useState({
-    nombre: reclamo?.nombre || "",
+    nombre: reclamo?.nombre || "", // Siempre debe ser un string
     producto: reclamo?.producto || "",
     productoPersonalizado: "",
     descripcion: reclamo?.descripcion || "",
@@ -30,11 +30,11 @@ function CrearReclamo() {
   useEffect(() => {
     const fetchClientes = async () => {     
       const token = localStorage.getItem("token");
-      const decodedToken = JSON.parse(atob(token.split(".")[1]));
+      const decodedToken = JSON.parse(atob(token.split(".")[1]));      
       setUserRole(decodedToken.rol);
       if (decodedToken.rol === "cliente") {
         const response = await fetch(
-          `https://reclamos-production-2298.up.railway.app/clientes/${decodedToken.id}`, // Endpoint para obtener un cliente específico
+          `https://reclamos-production-2298.up.railway.app/clientes/${decodedToken.id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -43,12 +43,10 @@ function CrearReclamo() {
         );
         if (!response.ok) {
           throw new Error("No se pudo obtener los datos del cliente");
-        }
-        console.log("de",response);
+        }       
         const cliente = await response.json();
         setFormData((prev) => ({
-          ...prev,
-          nombre: cliente.nombre,
+          ...prev,      
           cliente_id: cliente.id,
         }));
       }else {
@@ -153,14 +151,15 @@ function CrearReclamo() {
         <h2 className="text_reclamos">
           {reclamo ? "Editar Reclamo" : "Crear Reclamo"}
         </h2>
-        <form onSubmit={handleSubmit} className="form_reclamos_create">          
+        <form onSubmit={handleSubmit} className="form_reclamos_create">     
         {userRole === "cliente" ? (
-            <input
-              type="text"
-              value={formData.nombre}
-              readOnly
-              className="readonly-input"
-            />
+             <input
+             type="text"
+             value={formData.nombre}
+             readOnly
+             placeholder="Nombre del cliente no disponible"
+             className="readonly-input"
+           />
           ) : (
             <BuscadorCliente
               clientes={clientes}

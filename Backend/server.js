@@ -168,7 +168,6 @@ app.get("/reclamos/:id", async (req, res) => {
   }
 )
 
-
 app.get("/clientes", async (req, res) => {
   try {
     const [rows] = await clientesDb.query("SELECT * FROM cliente");
@@ -179,7 +178,6 @@ app.get("/clientes", async (req, res) => {
       .json({ error: "Error al obtener clientes", details: error.message });
   }
 });
-
 app.get("/clientes/:id", async (req, res) => {
   const { id } = req.params;
   try {
