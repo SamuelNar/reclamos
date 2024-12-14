@@ -31,9 +31,7 @@ const Reclamos = ({ token, onLogout }) => {
   const handleLogout = useCallback(async () => {
     try {
       // Decodificar el token para verificar la contraseña
-      // eslint-disable-next-line react/prop-types
-      const decodedToken = JSON.parse(atob(token.split(".")[1]));
-      
+
       // Cerrar sesión en el backend
       await API.post(
         "/auth/logout",
@@ -44,23 +42,9 @@ const Reclamos = ({ token, onLogout }) => {
           },
         }
       );
-  
-      // Si la contraseña es 123123, mostrar modal de cambio de contraseña
-      if (decodedToken?.password === "123123") {
-        // Mostrar un modal o prompt para cambiar la contraseña
-        const changePasswordConfirm = window.confirm(
-          "Debe cambiar su contraseña predeterminada antes de salir. ¿Desea cambiarla ahora?"
-        );
-  
-        if (changePasswordConfirm) {
-          // Redirigir a una pantalla de cambio de contraseña
-          navigate("/change-password");
-          return;
-        }
-      }
-  
       // Procedimiento normal de logout
       localStorage.removeItem("token");
+      localStorage.removeItem("userId");
       setRole("");
       onLogout();
       navigate("/login");
@@ -74,26 +58,6 @@ const Reclamos = ({ token, onLogout }) => {
       navigate("/login");
     }
   }, [token, onLogout, navigate]);
-
-
-  const fetchReclamos = useCallback(async () => {
-    try {
-      let response
-      // eslint-disable-next-line react/prop-types
-      const decodedToken = JSON.parse(atob(token.split('.')[1]));
-      const userId = decodedToken.id;
-      if( role === 'admin' || role === 'tecnico'){
-          response = await API.get("/reclamos");
-      }else if (role === 'cliente'){
-          response = await API.get(`/reclamos/${userId}`);
-      }
-      if(response){
-        setReclamos(response.data);
-      }      
-    } catch (err) {
-      console.error("Error fetching reclamos:", err);
-    }
-  }, [role,token]);
 
 
   const fetchRole = useCallback(() => {
@@ -113,14 +77,47 @@ const Reclamos = ({ token, onLogout }) => {
     }
   }, [token, handleLogout]);
 
+  const fetchReclamos = useCallback(async () => {
+    try {
+      let response       
+      if( role === 'admin' || role === 'tecnico'){
+        response = await API.get('/reclamos', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });          
+        setReclamos(response.data);   
+      }else if (role === 'cliente'){     
+        // eslint-disable-next-line react/prop-types
+          const decodedToken = JSON.parse(atob(token.split('.')[1]));
+           const userId = decodedToken.id; 
+          response = await API.get(`/reclamos/${userId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });   
+        const reclamosData = Array.isArray(response.data) ? response.data : [response.data];
+        setReclamos(reclamosData);                   
+      }         
+    } catch (err) {
+      console.error("Error fetching reclamos:", err);
+    }
+  }, [role,token]);
+
+
   useEffect(() => {
-    fetchReclamos();
     if (token) {
       fetchRole();
     } else {
       setRole("");
     }
-  }, [token, fetchReclamos, fetchRole]);
+  }, [token, fetchRole]);
+
+  useEffect(() => {
+    if (role) {
+      fetchReclamos();
+    }
+  }, [role, token, fetchReclamos]);
 
   const deleteReclamo = async (id) => {
     try {
@@ -444,7 +441,7 @@ const Reclamos = ({ token, onLogout }) => {
               <p>Producto: {reclamo.producto}</p>
               <p>Asignado: {reclamo.asignado || "No asignado"}</p>
               <p>Importancia: {reclamo.importancia}</p>       
-
+              <p>Cliente: {reclamo.cliente_id}</p>
               <div className="observaciones-container">
                 <p>
                   Observaciones:{" "}

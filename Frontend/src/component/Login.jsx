@@ -21,19 +21,26 @@ const Login = ({ onLogin }) => {
       });
   
       if (response.data && response.data.token) {
+        const token = response.data.token;
+        localStorage.setItem('token', token);
+
         const decodedToken = JSON.parse(atob(response.data.token.split(".")[1]));
         console.log("desde el login", decodedToken);
   
+        const userId = decodedToken?.id;
+        const userRole = decodedToken?.rol;
+        localStorage.setItem('userId', userId);        
         // Si necesita cambiar contraseña, redirigir a /change-password/:id
         if (decodedToken?.password === "123123" || decodedToken?.first_login) {
           // Redirigir a la ruta de cambio de contraseña con el ID
           navigate(`/change-password/${decodedToken.id}`);
+        }              
+        if (userRole === "cliente") {
+            navigate(`/reclamos`);
         } else {
-          // Flujo normal
-          localStorage.setItem('token', response.data.token);
-          onLogin(response.data.token);
-          navigate('/');
-        }
+            navigate('/'); // Ruta por defecto para otros roles
+        }                  
+        onLogin(response.data.token);
       } else {
         setError('Respuesta del servidor inesperada');
       }

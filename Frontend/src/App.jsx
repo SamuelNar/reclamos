@@ -15,14 +15,17 @@ function App() {
   const [token, setToken] = useState(localStorage.getItem("token") || null);
   const [userId, setUserId] = useState(localStorage.getItem("userId") || null);
   const navigate = useNavigate();   
+
   const handleLogin = (newToken) => {
     setToken(newToken);
     localStorage.setItem("token", newToken);
     // Decodificar el token para verificar
     try {
       const decodedToken = JSON.parse(atob(newToken.split(".")[1]));         
-      setUserId(decodedToken.id);    
-      localStorage.setItem("userId", userId);
+      const currentUserId = decodedToken.id;
+      setUserId(currentUserId);
+      console.log("decodedToken", currentUserId);
+      localStorage.setItem("userId",currentUserId);
       // Si la contraseña es 123123 o es primer login, redirigir a cambio de contraseña
       if (decodedToken?.password === "123123" || decodedToken?.first_login) {
         navigate(`/change-password/${userId}`); 

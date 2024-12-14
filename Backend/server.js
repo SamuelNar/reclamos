@@ -155,11 +155,11 @@ app.get("/reclamos", async (req, res) => {
 app.get("/reclamos/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    const [rows] = await db.query("SELECT * FROM reclamos WHERE cliente_id = ?", [id]);
+    const [rows] = await db.query("SELECT * FROM reclamos WHERE cliente_id = ?", id);
     if (rows.length === 0) {
       return res.status(404).json({ error: "Reclamo no encontrado" });
     }
-    res.status(200).json(rows[0]);
+    res.status(200).json(rows);
   } catch (error) {
     res
       .status(500)

@@ -25,3 +25,37 @@ VALUES ('Reclamo ejemplo', 'camara', 'Descripción', 'alta', 'activo', 'Maxi');
 
 select * from reclamos;
 delete from usuarios where id = 1;
+
+
+
+
+
+
+
+
+
+drop table cliente;
+-- Crear la tabla cliente
+CREATE TABLE cliente (
+    id INT PRIMARY KEY,
+    tipo_cliente ENUM('personaFisica', 'organizacion'),
+    nombre VARCHAR(100),
+    tipo_iva ENUM('responsableInscripto', 'monotributista', 'exento', 'consumidorFinal'),
+    cuit VARCHAR(20),
+    direccion VARCHAR(150),
+    localidad VARCHAR(100),
+    provincia VARCHAR(100),
+    telefono VARCHAR(20),
+    email VARCHAR(150)
+);
+
+-- Insertar los registros en la tabla cliente
+INSERT INTO cliente (id, tipo_cliente, nombre, tipo_iva, cuit, direccion, localidad, provincia, telefono, email)
+VALUES
+    (3, 'organizacion', 'sanIgnacio', 'responsableInscripto', '.', '.', '.', '.', '.', '.'),
+    (5, 'organizacion', 'navilli', 'responsableInscripto', '30-61840809-0', 'Estrada 624', 'Rio Cuarto', 'Cordoba', '3584018558', 'britos@puramel.com.ar'),
+    (6, 'organizacion', 'indelma', 'responsableInscripto', '30-70780778-9', 'P Industrial Roberto Grosso', 'General Cabrera', 'Cordoba', '3585620698', 'etamburelli@insamani.com.ar - recepcionplanta@insa'),
+    (7, 'organizacion', 'yacuray', 'responsableInscripto', '30-70941380-1', 'Avenida Santa Rosa 1727', 'Buenos Aires', 'Buenos Aires', '.', '.'),
+    (8, 'organizacion', 'olega', 'responsableInscripto', '30-56842524-9', '.', 'CABA', 'Buenos Aires', '.', '.'),
+    (9, 'organizacion', 'globoaves', 'responsableInscripto', '30-70872992-9', 'Tres Arroyos 400', 'Capital Federal', 'Buenos Aires', '1134350242', 'jfavre@gta.com.ar'),
+    (10, 'organizacion', 'cotagro', 'responsableInscripto', '.', '.', '.', '.', '.', '.');
