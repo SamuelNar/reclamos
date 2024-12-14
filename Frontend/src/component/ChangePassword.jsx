@@ -4,10 +4,14 @@ import API from "../utils/api";
 
 // eslint-disable-next-line react/prop-types
 function ChangePassword({ token, setIsPasswordChanged }) {
-  const { id } = useParams(); 
+  let { id } = useParams(); 
   const [newPassword, setNewPassword] = useState('');
   const [error, setError] = useState(null);
 
+  // eslint-disable-next-line react/prop-types
+  const decodedToken = JSON .parse(atob(token.split(".")[1]));        
+  id = decodedToken.id;
+ 
   const changePassword = async () => {
     if (!newPassword.trim()) {
       setError("La contraseña no puede estar vacía");
@@ -20,7 +24,7 @@ function ChangePassword({ token, setIsPasswordChanged }) {
     }
   
     try {
-      console.log("Enviando solicitud para cambiar la contraseña..."); // Agregar log para depurar
+
       const response = await API.patch(
         `/changePassword/${id}`,  // El id ahora es parte de la URL
         { password: newPassword }, // Solo enviamos la nueva contraseña en el cuerpo
@@ -32,7 +36,7 @@ function ChangePassword({ token, setIsPasswordChanged }) {
         }
       );    
 
-      console.log("Respuesta de la API:", response);  // Log de la respuesta de la API
+   
 
       if (response.status === 200) {
         setError(null);

@@ -44,10 +44,8 @@ const authenticateToken = (req, res, next) => {
 };
 
 app.patch("/changePassword/:id", async (req, res) => {
-  const { id } = req.params;  
-  console.log("Cuerpo de la solicitud:", req.params);
-  const {password } = req.body;
-  console.log("ID:", id, "Password:", password);
+  const { id } = req.params;    
+  const {password } = req.body;  
 
   if (!password) {
     return res.status(400).json({ error: "La contraseña es requerida" });
@@ -267,16 +265,6 @@ app.put("/reclamos/:id", authenticateToken, async (req, res) => {
   
   // Usar descripcionPersonalizada si descripcion es "otros"
   const finalDescripcion = descripcion === 'otros' ? descripcionPersonalizada : descripcion;
-  console.log(nombre, 
-    producto, 
-    productoPersonalizado,
-    descripcion, 
-    descripcionPersonalizada,
-    importancia, 
-    observaciones,
-    estado, 
-    asignado,
-    cliente_id )
   if (!nombre || !finalProducto || !finalDescripcion || !importancia || !estado || !asignado) {
     return res.status(401).json({ error: "Faltan campos obligatorios" });
   }
@@ -399,8 +387,7 @@ app.put("/reclamos/:id/firma", async (req, res) => {
     const filePath = `${directory}/reclamo_${reclamoId}.png`;
 
     // Guardar la firma como un archivo en el sistema de archivos
-    fs.writeFileSync(filePath, base64Data, "base64");
-    console.log('Archivo guardado en:', filePath);
+    fs.writeFileSync(filePath, base64Data, "base64");    
     // Actualizar la base de datos con la ruta de la firma
     const [result] = await db.query(
       "UPDATE reclamos SET firma = ? WHERE id = ?",

@@ -31,24 +31,27 @@ function CrearReclamo() {
     const fetchClientes = async () => {     
       const token = localStorage.getItem("token");
       const decodedToken = JSON.parse(atob(token.split(".")[1]));      
-      setUserRole(decodedToken.rol);
+      setUserRole(decodedToken.rol);     
       if (decodedToken.rol === "cliente") {
-        const response = await fetch(
-          `https://reclamos-production-2298.up.railway.app/clientes/${decodedToken.id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        if (!response.ok) {
-          throw new Error("No se pudo obtener los datos del cliente");
+        try {
+          const response = await fetch(
+            `https://reclamos-production-2298.up.railway.app/clientes/${decodedToken.id}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );          
+          const cliente = await response.json();
+          const clienteData = cliente[0]; 
+          setFormData((prev) => ({
+            ...prev,
+            nombre: clienteData.nombre,      
+            cliente_id: cliente.id,
+          })); 
+        } catch (error) {
+          console.log(error)
         }       
-        const cliente = await response.json();
-        setFormData((prev) => ({
-          ...prev,      
-          cliente_id: cliente.id,
-        }));
       }else {
         try {
           const response = await fetch(
@@ -58,11 +61,11 @@ function CrearReclamo() {
                 Authorization: `Bearer ${localStorage.getItem("token")}`,
               },
             }
-          );        
+          );                  
           if (!response.ok) {
             throw new Error("Error al obtener la lista de clientes");
           }
-          const data = await response.json();
+          const data = await response.json();       
           setClientes(data);
         } catch (error) {
           setError("No se pudo cargar la lista de clientes.",error);

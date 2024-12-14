@@ -23,10 +23,7 @@ const Login = ({ onLogin }) => {
       if (response.data && response.data.token) {
         const token = response.data.token;
         localStorage.setItem('token', token);
-
-        const decodedToken = JSON.parse(atob(response.data.token.split(".")[1]));
-        console.log("desde el login", decodedToken);
-  
+        const decodedToken = JSON.parse(atob(response.data.token.split(".")[1]));        
         const userId = decodedToken?.id;
         const userRole = decodedToken?.rol;
         localStorage.setItem('userId', userId);        

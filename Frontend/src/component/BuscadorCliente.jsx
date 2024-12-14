@@ -13,9 +13,7 @@ function BuscadorCliente({ clientes, formData, setFormData }) {
       setFormData({ ...formData, cliente_id: cliente_id, nombre: clienteNombre }); // Ajusta 'cliente_id' en lugar de 'clienteId'
       setSearchTerm(clienteNombre); // Muestra el nombre seleccionado en el buscador
       setIsOpen(false);
-      console.log(cliente_id);
-      console.log(clienteNombre);
-      console.log(formData);
+  
     };
   
     // eslint-disable-next-line react/prop-types
