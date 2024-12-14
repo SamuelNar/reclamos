@@ -75,14 +75,26 @@ const Reclamos = ({ token, onLogout }) => {
     }
   }, [token, onLogout, navigate]);
 
+
   const fetchReclamos = useCallback(async () => {
     try {
-      const response = await API.get("/reclamos");
-      setReclamos(response.data);
+      let response
+      // eslint-disable-next-line react/prop-types
+      const decodedToken = JSON.parse(atob(token.split('.')[1]));
+      const userId = decodedToken.id;
+      if( role === 'admin' || role === 'tecnico'){
+          response = await API.get("/reclamos");
+      }else if (role === 'cliente'){
+          response = await API.get(`/reclamos/${userId}`);
+      }
+      if(response){
+        setReclamos(response.data);
+      }      
     } catch (err) {
       console.error("Error fetching reclamos:", err);
     }
-  }, []);
+  }, [role,token]);
+
 
   const fetchRole = useCallback(() => {
     if (token) {
@@ -276,6 +288,75 @@ const Reclamos = ({ token, onLogout }) => {
     checkPasswordChange();
   }, [token, checkPasswordChange]);
 
+  const renderReclamoActions = (reclamo) => {
+    if (role === "admin") {
+      return (
+        <div className="reclamo-actions">
+          <button onClick={() => deleteReclamo(reclamo.id)}>
+            <FontAwesomeIcon icon={faTrashAlt} /> Eliminar
+          </button>
+          <button
+            onClick={() =>
+              navigate(`/reclamos/${reclamo.id}`, {
+                state: { reclamo },
+              })
+            }
+          >
+            <FontAwesomeIcon icon={faEdit} /> Editar
+          </button>
+        </div>
+      );
+    }
+
+    if (role === 'tecnico') {
+      return (
+        <div className="reclamo-actions">
+          {reclamo.estado !== "finalizado" && reclamo.estado !== "eliminado" && (
+            <button
+              className="change-status-button"
+              onClick={() => changeReclamoStatus(reclamo.id, reclamo.estado)}
+            >
+              <FontAwesomeIcon icon={faSyncAlt} /> Cambiar Estado
+            </button>
+          )}
+        </div>
+      );
+    }
+
+    if (role === 'cliente') {
+      return (
+        reclamo.estado === "en proceso" && (
+          <div className="signature-container">
+            <h3>Firma Virtual</h3>
+            <SignatureCanvas
+              ref={(ref) => (signaturePads.current[reclamo.id] = ref)}
+              backgroundColor="white"
+              penColor="black"
+              canvasWidth={500}
+              canvasHeight={200}
+            />
+            <div className="signature-buttons">
+              <button onClick={() => saveSignature(reclamo.id)}>
+                Guardar Firma
+              </button>
+              <button onClick={() => clearSignature(reclamo.id)}>
+                Limpiar Firma
+              </button>
+            </div>
+            {signatures[reclamo.id] && (
+              <div className="signature-preview">
+                <h4>Firma Guardada:</h4>
+                <img src={signatures[reclamo.id]} alt="Firma" />
+              </div>
+            )}
+          </div>
+        )
+      );
+    }
+    return null
+  }
+
+
   if (!isPasswordChanged) {
     return (
       <div className="change-password-container">
@@ -319,6 +400,8 @@ const Reclamos = ({ token, onLogout }) => {
         )}
       </div>
 
+
+      {(role === 'admin' || role === 'tecnico') && (
       <div className="filters">
         <div className="status-filter">
           <label>Filtrar por estado:</label>
@@ -346,6 +429,7 @@ const Reclamos = ({ token, onLogout }) => {
           <FontAwesomeIcon icon={faSearch} className="search-icon" />
         </div>
       </div>
+    )}
 
       <div className="reclamos-list">
         {filteredReclamos.length > 0 ? (
@@ -359,7 +443,8 @@ const Reclamos = ({ token, onLogout }) => {
               <p>Estado: {reclamo.estado}</p>
               <p>Producto: {reclamo.producto}</p>
               <p>Asignado: {reclamo.asignado || "No asignado"}</p>
-              <p>Importancia: {reclamo.importancia}</p>          
+              <p>Importancia: {reclamo.importancia}</p>       
+
               <div className="observaciones-container">
                 <p>
                   Observaciones:{" "}
@@ -408,63 +493,8 @@ const Reclamos = ({ token, onLogout }) => {
                 Fecha:{" "}
                 {format(new Date(reclamo.fecha_creacion), "dd/MM/yyyy HH:mm")}
               </p>
-
-              <div className="reclamo-status-actions">
-                {reclamo.estado !== "finalizado" && reclamo.estado !== "eliminado" && (
-                  <button
-                    className="change-status-button"
-                    onClick={() => changeReclamoStatus(reclamo.id, reclamo.estado)}
-                  >
-                    <FontAwesomeIcon icon={faSyncAlt} /> Cambiar Estado
-                  </button>
-                )}
-
-                 {
-                reclamo.estado === "en proceso" && (
-                  <div className="signature-container">
-                  <h3>Firma Virtual</h3>
-                  <SignatureCanvas
-                    ref={(ref) => (signaturePads.current[reclamo.id] = ref)}
-                    backgroundColor="white"
-                    penColor="black"
-                    canvasWidth={500}
-                    canvasHeight={200}
-                  />
-                  <div className="signature-buttons">
-                    <button onClick={() => saveSignature(reclamo.id)}>
-                      Guardar Firma
-                    </button>
-                    <button onClick={() => clearSignature(reclamo.id)}>
-                      Limpiar Firma
-                    </button>
-                  </div>
-                  {signatures[reclamo.id] && (
-                    <div className="signature-preview">
-                      <h4>Firma Guardada:</h4>
-                      <img src={signatures[reclamo.id]} alt="Firma" />
-                    </div>
-                  )}
-                </div>
-                )
-              }
-                {role === "admin" && (
-                  <div className="reclamo-actions">
-                    <button onClick={() => deleteReclamo(reclamo.id)}>
-                      <FontAwesomeIcon icon={faTrashAlt} /> Eliminar
-                    </button>
-                    <button
-                      onClick={() =>
-                        navigate(`/reclamos/${reclamo.id}`, {
-                          state: { reclamo },
-                        })
-                      }
-                    >
-                      <FontAwesomeIcon icon={faEdit} /> Editar
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
+                {renderReclamoActions(reclamo)}
+            </div>            
           ))
         ) : (
           <div className="no-reclamos">
@@ -472,15 +502,11 @@ const Reclamos = ({ token, onLogout }) => {
           </div>
         )}
       </div>
-
-        
-
-
-      {token && role === "admin" && (
-        <button className="create-button" onClick={() => navigate("/crear")}>
-          Crear Reclamo
-        </button>
-      )}
+      {(token && (role === "cliente" || role === "admin")) && (
+      <button className="create-button" onClick={() => navigate("/crear")}>
+        Crear Reclamo
+      </button>
+    )}
     </div>
   );
 };
