@@ -96,8 +96,8 @@ const Reclamos = ({ token, onLogout }) => {
             Authorization: `Bearer ${token}`,
           },
         });   
-        const reclamosData = Array.isArray(response.data) ? response.data : [response.data];
-        setReclamos(reclamosData);                   
+        //const reclamosData = Array.isArray(response.data) ? response.data : [response.data];
+        setReclamos(response.data);                   
       }         
     } catch (err) {
       console.error("Error fetching reclamos:", err);
