@@ -25,29 +25,52 @@ function CrearReclamo() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-
+  const [userRole, setUserRole] = useState("");
 
   useEffect(() => {
-    const fetchClientes = async () => {
-      try {
+    const fetchClientes = async () => {     
+      const token = localStorage.getItem("token");
+      const decodedToken = JSON.parse(atob(token.split(".")[1]));
+      setUserRole(decodedToken.rol);
+      if (decodedToken.rol === "cliente") {
         const response = await fetch(
-          "https://reclamos-production-2298.up.railway.app/clientes",
+          `https://reclamos-production-2298.up.railway.app/clientes/${decodedToken.id}`, // Endpoint para obtener un cliente específico
           {
             headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
+              Authorization: `Bearer ${token}`,
             },
           }
-        );        
+        );
         if (!response.ok) {
-          throw new Error("Error al obtener la lista de clientes");
+          throw new Error("No se pudo obtener los datos del cliente");
         }
-        const data = await response.json();
-        setClientes(data); // Suponiendo que el API devuelve un arreglo de clientes
-      } catch (error) {
-        setError("No se pudo cargar la lista de clientes.",error);
+        console.log("de",response);
+        const cliente = await response.json();
+        setFormData((prev) => ({
+          ...prev,
+          nombre: cliente.nombre,
+          cliente_id: cliente.id,
+        }));
+      }else {
+        try {
+          const response = await fetch(
+            "https://reclamos-production-2298.up.railway.app/clientes",
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+            }
+          );        
+          if (!response.ok) {
+            throw new Error("Error al obtener la lista de clientes");
+          }
+          const data = await response.json();
+          setClientes(data);
+        } catch (error) {
+          setError("No se pudo cargar la lista de clientes.",error);
+        }
       }
     };
-
     fetchClientes();
   }, []);
 
@@ -67,7 +90,6 @@ function CrearReclamo() {
       }
     }
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -132,11 +154,20 @@ function CrearReclamo() {
           {reclamo ? "Editar Reclamo" : "Crear Reclamo"}
         </h2>
         <form onSubmit={handleSubmit} className="form_reclamos_create">          
-        <BuscadorCliente
-            clientes={clientes}
-            formData={formData}
-            setFormData={setFormData}
-          />
+        {userRole === "cliente" ? (
+            <input
+              type="text"
+              value={formData.nombre}
+              readOnly
+              className="readonly-input"
+            />
+          ) : (
+            <BuscadorCliente
+              clientes={clientes}
+              formData={formData}
+              setFormData={setFormData}
+            />
+          )}
           <select
             name="producto"
             value={formData.producto}

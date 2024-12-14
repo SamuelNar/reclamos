@@ -9,7 +9,7 @@ import {
   faTimes,
   faSearch,
 } from "@fortawesome/free-solid-svg-icons";
-import { useNavigate } from "react-router-dom";
+import { useNavigate} from "react-router-dom";
 import API from "../utils/api";
 import { format } from "date-fns";
 import "./reclamos.css";
@@ -23,11 +23,8 @@ const Reclamos = ({ token, onLogout }) => {
   const [editingObservaciones, setEditingObservaciones] = useState(null);
   const [tempObservaciones, setTempObservaciones] = useState("");
   const [signatures, setSignatures] = useState({}); // Para almacenar firmas por reclamo
-  const [newPassword, setNewPassword] = useState("");
-  const [isPasswordChanged, setIsPasswordChanged] = useState(false);
   const signaturePads = useRef({});  // Referencias para cada firma
   const navigate = useNavigate();
-
   const handleLogout = useCallback(async () => {
     try {
       // Decodificar el token para verificar la contraseña
@@ -238,53 +235,6 @@ const Reclamos = ({ token, onLogout }) => {
     }));
   };
 
-  const checkPasswordChange = useCallback(() => {
-    if (token) {
-      try {
-        // eslint-disable-next-line react/prop-types
-        const decodedToken = JSON.parse(atob(token.split(".")[1]));
-        
-        // Verificar si el usuario necesita cambiar la contraseña
-        if (decodedToken?.first_login || decodedToken?.password === "123123") {
-          setIsPasswordChanged(false);
-        } else {
-          setIsPasswordChanged(true);
-        }
-      } catch (error) {
-        console.error("Error decoding token:", error);
-        onLogout();
-      }
-    }
-  }, [token, onLogout]);
-
-  const changePassword = async () => {
-    // Validar que la contraseña no esté vacía
-    if (!newPassword.trim()) {
-      alert("Por favor, ingrese una nueva contraseña");
-      return;
-    }
-
-    try {
-      await API.put(
-        "/changePassword",
-        { password: newPassword },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      setIsPasswordChanged(true);
-    } catch (err) {
-      console.error("Error changing password:", err);
-      alert("No se pudo cambiar la contraseña. Intente nuevamente.");
-    }
-  };
-
-  useEffect(() => {
-    checkPasswordChange();
-  }, [token, checkPasswordChange]);
-
   const renderReclamoActions = (reclamo) => {
     if (role === "admin") {
       return (
@@ -352,35 +302,7 @@ const Reclamos = ({ token, onLogout }) => {
     }
     return null
   }
-
-
-  if (!isPasswordChanged) {
-    return (
-      <div className="change-password-container">
-        <h2>Cambio de Contraseña Obligatorio</h2>
-        <p>Por seguridad, debe cambiar su contraseña predeterminada</p>
-        <input
-          type="password"
-          placeholder="Nueva contraseña"
-          value={newPassword}
-          onChange={(e) => setNewPassword(e.target.value)}
-          className="password-input"
-        />
-        <button 
-          onClick={changePassword} 
-          className="change-password-button"
-        >
-          Cambiar Contraseña
-        </button>
-        <button 
-          onClick={onLogout} 
-          className="cancel-button"
-        >
-          Cancelar y Salir
-        </button>
-      </div>
-    );
-  }
+  
   
   return (
     <div className="reclamos-container">
