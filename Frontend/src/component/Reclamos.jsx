@@ -218,15 +218,29 @@ const Reclamos = ({ token, onLogout }) => {
             Authorization: `Bearer ${token}`,
           },
         }
+      );            
+      await API.patch(
+        `/reclamos/${id}/estado`,
+        { estado: "finalizado" },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
+  
       setSignatures((prev) => ({
         ...prev,
         [id]: signatureData,
       }));
+  
+      // Refresh the reclamos list to reflect the new status
+      fetchReclamos();
     } catch (err) {
       console.error("Error saving signature:", err);
     }
   };
+
   const clearSignature = (id) => {
     signaturePads.current[id].clear();
     setSignatures((prev) => ({
@@ -319,7 +333,6 @@ const Reclamos = ({ token, onLogout }) => {
         )}
       </div>
 
-
       {(role === 'admin' || role === 'tecnico') && (
       <div className="filters">
         <div className="status-filter">
@@ -349,7 +362,7 @@ const Reclamos = ({ token, onLogout }) => {
         </div>
       </div>
     )}
-
+    
       <div className="reclamos-list">
         {filteredReclamos.length > 0 ? (
           filteredReclamos.map((reclamo) => (

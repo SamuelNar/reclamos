@@ -78,7 +78,7 @@ function App() {
         }
       />
       <Route
-        path="/change-password/:id" // Parámetro de la URL
+        path="/change-password/:id"
         element={
           <ChangePassword
             token={token}
