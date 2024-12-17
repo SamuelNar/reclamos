@@ -384,8 +384,6 @@ app.put("/reclamos/:id/firma", async (req, res) => {
     // Convertir la firma base64 a un archivo
     const base64Data = firma.replace(/^data:image\/png;base64,/, "");
     const filePath = `${directory}/reclamo_${reclamoId}.png`;
-    console.log(`Firma guardada en: ${filePath}`);
-    // Guardar la firma como un archivo en el sistema de archivos
     fs.writeFileSync(filePath, base64Data, "base64");    
     // Actualizar la base de datos con la ruta de la firma
     const [result] = await db.query(
@@ -405,6 +403,34 @@ app.put("/reclamos/:id/firma", async (req, res) => {
     console.error("Error al guardar la firma:", error);
     res.status(500).json({
       error: "Error al guardar la firma",
+      details: error.message,
+    });
+  }
+});
+
+app.get("/reclamos/firma/:cliente_id", async (req, res) => {
+  const {cliente_id} = req.params.id;
+
+  try {
+    const [rows] = await db.query("SELECT firma FROM reclamos WHERE cliente_id = ?", cliente_id);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ error: "Reclamo no encontrado" });
+    }
+
+    const filePath = rows[0].firma;
+
+    // Verificar si el archivo existe
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ error: "Firma no encontrada en el servidor" });
+    }
+
+    // Enviar el archivo como respuesta
+    res.sendFile(path.resolve(filePath));
+  } catch (error) {
+    console.error("Error al obtener la firma:", error);
+    res.status(500).json({
+      error: "Error al obtener la firma",
       details: error.message,
     });
   }

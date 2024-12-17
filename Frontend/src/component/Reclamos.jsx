@@ -9,10 +9,11 @@ import {
   faTimes,
   faSearch,
 } from "@fortawesome/free-solid-svg-icons";
-import { useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import API from "../utils/api";
 import { format } from "date-fns";
 import "./reclamos.css";
+import FirmaImagen from "./FirmaImagen";
 
 // eslint-disable-next-line react/prop-types
 const Reclamos = ({ token, onLogout }) => {
@@ -24,6 +25,7 @@ const Reclamos = ({ token, onLogout }) => {
   const [tempObservaciones, setTempObservaciones] = useState("");
   const [signatures, setSignatures] = useState({}); // Para almacenar firmas por reclamo
   const signaturePads = useRef({});  // Referencias para cada firma
+ 
   const navigate = useNavigate();
   const handleLogout = useCallback(async () => {
     try {
@@ -45,7 +47,7 @@ const Reclamos = ({ token, onLogout }) => {
       setRole("");
       onLogout();
       navigate("/login");
-  
+
     } catch (err) {
       console.error("Error en logout:", err);
       // Logout normal en caso de error
@@ -76,30 +78,30 @@ const Reclamos = ({ token, onLogout }) => {
 
   const fetchReclamos = useCallback(async () => {
     try {
-      let response       
-      if( role === 'admin' || role === 'tecnico'){
+      let response
+      if (role === 'admin' || role === 'tecnico') {
         response = await API.get('/reclamos', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        });          
-        setReclamos(response.data);   
-      }else if (role === 'cliente'){     
+        });
+        setReclamos(response.data);
+      } else if (role === 'cliente') {
         // eslint-disable-next-line react/prop-types
-          const decodedToken = JSON.parse(atob(token.split('.')[1]));
-           const userId = decodedToken.id; 
-          response = await API.get(`/reclamos/${userId}`, {
+        const decodedToken = JSON.parse(atob(token.split('.')[1]));
+        const userId = decodedToken.id;
+        response = await API.get(`/reclamos/${userId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        });   
+        });
         //const reclamosData = Array.isArray(response.data) ? response.data : [response.data];
-        setReclamos(response.data);                   
-      }         
+        setReclamos(response.data);
+      }
     } catch (err) {
       console.error("Error fetching reclamos:", err);
     }
-  }, [role,token]);
+  }, [role, token]);
 
 
   useEffect(() => {
@@ -144,7 +146,7 @@ const Reclamos = ({ token, onLogout }) => {
       alert("Debe firmar antes de finalizar el reclamo.");
       return;
     }
-    
+
     try {
       await API.patch(
         `/reclamos/${id}/estado`,
@@ -218,7 +220,7 @@ const Reclamos = ({ token, onLogout }) => {
             Authorization: `Bearer ${token}`,
           },
         }
-      );            
+      );
       await API.patch(
         `/reclamos/${id}/estado`,
         { estado: "finalizado" },
@@ -228,12 +230,12 @@ const Reclamos = ({ token, onLogout }) => {
           },
         }
       );
-  
+
       setSignatures((prev) => ({
         ...prev,
         [id]: signatureData,
       }));
-  
+
       // Refresh the reclamos list to reflect the new status
       fetchReclamos();
     } catch (err) {
@@ -248,6 +250,7 @@ const Reclamos = ({ token, onLogout }) => {
       [id]: null,  // Resetea la firma guardada para el reclamo
     }));
   };
+
 
   const renderReclamoActions = (reclamo) => {
     if (role === "admin") {
@@ -316,8 +319,8 @@ const Reclamos = ({ token, onLogout }) => {
     }
     return null
   }
-  
-  
+
+
   return (
     <div className="reclamos-container">
       <div className="header">
@@ -334,35 +337,35 @@ const Reclamos = ({ token, onLogout }) => {
       </div>
 
       {(role === 'admin' || role === 'tecnico') && (
-      <div className="filters">
-        <div className="status-filter">
-          <label>Filtrar por estado:</label>
-          <select
-            value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e.target.value)}
-          >
-            <option value="">Todos</option>
-            <option value="inactivo">Inactivo</option>
-            <option value="activo">Activo</option>
-            <option value="en proceso">En Proceso</option>
-            <option value="finalizado">Finalizado</option>
-            <option value="eliminado">Eliminado</option>
-          </select>
-        </div>
+        <div className="filters">
+          <div className="status-filter">
+            <label>Filtrar por estado:</label>
+            <select
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+            >
+              <option value="">Todos</option>
+              <option value="inactivo">Inactivo</option>
+              <option value="activo">Activo</option>
+              <option value="en proceso">En Proceso</option>
+              <option value="finalizado">Finalizado</option>
+              <option value="eliminado">Eliminado</option>
+            </select>
+          </div>
 
-        <div className="search-filter">
-          <input
-            type="text"
-            placeholder="Buscar por nombre"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="search-input"
-          />
-          <FontAwesomeIcon icon={faSearch} className="search-icon" />
+          <div className="search-filter">
+            <input
+              type="text"
+              placeholder="Buscar por nombre"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="search-input"
+            />
+            <FontAwesomeIcon icon={faSearch} className="search-icon" />
+          </div>
         </div>
-      </div>
-    )}
-    
+      )}
+
       <div className="reclamos-list">
         {filteredReclamos.length > 0 ? (
           filteredReclamos.map((reclamo) => (
@@ -375,7 +378,7 @@ const Reclamos = ({ token, onLogout }) => {
               <p>Estado: {reclamo.estado}</p>
               <p>Producto: {reclamo.producto}</p>
               <p>Asignado: {reclamo.asignado || "No asignado"}</p>
-              <p>Importancia: {reclamo.importancia}</p>       
+              <p>Importancia: {reclamo.importancia}</p>
               <p>Cliente: {reclamo.cliente_id}</p>
               <div className="observaciones-container">
                 <p>
@@ -425,8 +428,9 @@ const Reclamos = ({ token, onLogout }) => {
                 Fecha:{" "}
                 {format(new Date(reclamo.fecha_creacion), "dd/MM/yyyy HH:mm")}
               </p>
-                {renderReclamoActions(reclamo)}
-            </div>            
+              {renderReclamoActions(reclamo)}              
+              <FirmaImagen clientId={reclamo.cliente_id} />
+            </div>
           ))
         ) : (
           <div className="no-reclamos">
@@ -435,10 +439,10 @@ const Reclamos = ({ token, onLogout }) => {
         )}
       </div>
       {(token && (role === "cliente" || role === "admin")) && (
-      <button className="create-button" onClick={() => navigate("/crear")}>
-        Crear Reclamo
-      </button>
-    )}
+        <button className="create-button" onClick={() => navigate("/crear")}>
+          Crear Reclamo
+        </button>
+      )}
     </div>
   );
 };
