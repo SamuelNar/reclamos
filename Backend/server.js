@@ -221,9 +221,9 @@ app.post("/reclamos", authenticateToken, async (req, res) => {
     // Insertar el reclamo en la base de datos
     const [result] = await db.query(
       `INSERT INTO reclamos (
-        nombre, producto, descripcion, importancia, observaciones, estado,cliente_id
+        nombre, producto, descripcion, importancia, observaciones, estado, asignado, cliente_id
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [nombre, finalProducto, finalDescripcion, importancia, observaciones, estado, cliente_id]
+      [nombre, finalProducto, finalDescripcion, importancia, observaciones, estado, asignado, cliente_id]
     );
 
     // Responder con el nuevo reclamo creado
