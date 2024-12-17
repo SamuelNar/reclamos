@@ -323,7 +323,7 @@ const Reclamos = ({ token, onLogout }) => {
   return (
     <div className="reclamos-container">
       <div className="header">
-        <h1>Reclamos</h1>
+        <h1>Reclamos LiderCom</h1>
         {token ? (
           <button className="logout-button" onClick={handleLogout}>
             Cerrar Sesión
