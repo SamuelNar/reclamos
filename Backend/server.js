@@ -385,7 +385,7 @@ app.put("/reclamos/:id/firma", async (req, res) => {
     // Convertir la firma base64 a un archivo
     const base64Data = firma.replace(/^data:image\/png;base64,/, "");
     const filePath = `${directory}/reclamo_${reclamoId}.png`;
-
+    console.log(`Firma guardada en: ${filePath}`);
     // Guardar la firma como un archivo en el sistema de archivos
     fs.writeFileSync(filePath, base64Data, "base64");    
     // Actualizar la base de datos con la ruta de la firma

@@ -1,4 +1,4 @@
-import { useState, useEffect} from "react";
+import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "./crearReclamo.css";
 import BuscadorCliente from "./BuscadorCliente";
@@ -26,12 +26,11 @@ function CrearReclamo() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [userRole, setUserRole] = useState("");
-
   useEffect(() => {
-    const fetchClientes = async () => {     
+    const fetchClientes = async () => {
       const token = localStorage.getItem("token");
-      const decodedToken = JSON.parse(atob(token.split(".")[1]));      
-      setUserRole(decodedToken.rol);     
+      const decodedToken = JSON.parse(atob(token.split(".")[1]));
+      setUserRole(decodedToken.rol);
       if (decodedToken.rol === "cliente") {
         try {
           const response = await fetch(
@@ -41,18 +40,18 @@ function CrearReclamo() {
                 Authorization: `Bearer ${token}`,
               },
             }
-          );          
+          );
           const cliente = await response.json();
-          const clienteData = cliente[0]; 
+          const clienteData = cliente[0];
           setFormData((prev) => ({
             ...prev,
-            nombre: clienteData.nombre,      
+            nombre: clienteData.nombre,
             cliente_id: cliente.id,
-          })); 
+          }));
         } catch (error) {
           console.log(error)
-        }       
-      }else {
+        }
+      } else {
         try {
           const response = await fetch(
             "https://reclamos-production-2298.up.railway.app/clientes",
@@ -61,14 +60,14 @@ function CrearReclamo() {
                 Authorization: `Bearer ${localStorage.getItem("token")}`,
               },
             }
-          );                  
+          );
           if (!response.ok) {
             throw new Error("Error al obtener la lista de clientes");
           }
-          const data = await response.json();       
+          const data = await response.json();
           setClientes(data);
         } catch (error) {
-          setError("No se pudo cargar la lista de clientes.",error);
+          setError("No se pudo cargar la lista de clientes.", error);
         }
       }
     };
@@ -96,7 +95,7 @@ function CrearReclamo() {
     setLoading(true);
     setError("");
     setSuccess("");
-  
+
     const reclamoData = {
       ...formData,
       producto:
@@ -109,7 +108,7 @@ function CrearReclamo() {
           : formData.descripcion,
       observaciones: formData.observaciones || "Ingrese observaciones",
     };
-  
+
     try {
       const token = localStorage.getItem("token");
       const method = reclamo ? "PUT" : "POST";
@@ -129,7 +128,7 @@ function CrearReclamo() {
         console.error("Error del servidor:", errorData);
         throw new Error(errorData.error || "Error al procesar el reclamo");
       }
-  
+
       // Éxito: Mostrar mensaje y redirigir
       setSuccess(
         reclamo ? "Reclamo actualizado con éxito" : "Reclamo creado con éxito"
@@ -142,7 +141,7 @@ function CrearReclamo() {
       setLoading(false);
     }
   };
-  
+
   const handleHome = () => {
     navigate("/");
   }
@@ -154,15 +153,15 @@ function CrearReclamo() {
         <h2 className="text_reclamos">
           {reclamo ? "Editar Reclamo" : "Crear Reclamo"}
         </h2>
-        <form onSubmit={handleSubmit} className="form_reclamos_create">     
-        {userRole === "cliente" ? (
-             <input
-             type="text"
-             value={formData.nombre}
-             readOnly
-             placeholder="Nombre del cliente no disponible"
-             className="readonly-input"
-           />
+        <form onSubmit={handleSubmit} className="form_reclamos_create">
+          {userRole === "cliente" ? (
+            <input
+              type="text"
+              value={formData.nombre}
+              readOnly
+              placeholder="Nombre del cliente no disponible"
+              className="readonly-input"
+            />
           ) : (
             <BuscadorCliente
               clientes={clientes}
@@ -246,23 +245,26 @@ function CrearReclamo() {
             <option value="finalizado">Finalizado</option>
             <option value="eliminado">Eliminado</option>
           </select>
-
-          <select
-            name="asignado"
-            value={formData.asignado}
-            onChange={handleChange}
-            required
-          >
-            <option value="">Asignar a</option>
-            <option value="Samuel">Samuel</option>
-            <option value="Maxi">Maxi</option>
-            <option value="Joel">Joel</option>
-            <option value="Agustin">Agustin</option>
-            <option value="Silvio">Silvio</option>
-            <option value="Gabriel">Gabriel</option>
-            <option value="Agustin b">Agustin b</option>
-            <option value="Matias">Matias</option>
-          </select>                  
+          {/*
+              {reclamo && (
+            <select
+              name="asignado"
+              value={formData.asignado}
+              onChange={handleChange}
+              required
+            >
+              <option value="">Asignar a</option>
+              <option value="Samuel">Samuel</option>
+              <option value="Maxi">Maxi</option>
+              <option value="Joel">Joel</option>
+              <option value="Agustin">Agustin</option>
+              <option value="Silvio">Silvio</option>
+              <option value="Gabriel">Gabriel</option>
+              <option value="Agustin b">Agustin b</option>
+              <option value="Matias">Matias</option>
+            </select>
+          )}
+          */}          
           {error && <div className="error-message">{error}</div>}
           {success && <div className="success-message">{success}</div>}
 
