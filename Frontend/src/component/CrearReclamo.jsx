@@ -246,7 +246,7 @@ function CrearReclamo() {
             <option value="finalizado">Finalizado</option>
             <option value="eliminado">Eliminado</option>
           </select>
-          {/*
+          
               {reclamo && (
             <select
               name="asignado"
@@ -264,8 +264,7 @@ function CrearReclamo() {
               <option value="Agustin b">Agustin b</option>
               <option value="Matias">Matias</option>
             </select>
-          )}
-          */}          
+          )}        
           {error && <div className="error-message">{error}</div>}
           {success && <div className="success-message">{success}</div>}
 
