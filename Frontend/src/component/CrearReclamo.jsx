@@ -46,8 +46,8 @@ function CrearReclamo() {
           setFormData((prev) => ({
             ...prev,
             nombre: clienteData.nombre,
-            cliente_id: cliente.id,
-          }));
+            cliente_id: clienteData.id,
+          }));         
         } catch (error) {
           console.log(error)
         }
@@ -121,8 +121,9 @@ function CrearReclamo() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(reclamoData),
+        body: JSON.stringify(reclamoData),        
       });
+      console.log(reclamoData);
       if (!response.ok) {
         const errorData = await response.json();
         console.error("Error del servidor:", errorData);
