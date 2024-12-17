@@ -13,7 +13,6 @@ import { useNavigate } from "react-router-dom";
 import API from "../utils/api";
 import { format } from "date-fns";
 import "./reclamos.css";
-import FirmaImagen from "./FirmaImagen";
 
 // eslint-disable-next-line react/prop-types
 const Reclamos = ({ token, onLogout }) => {
@@ -428,8 +427,7 @@ const Reclamos = ({ token, onLogout }) => {
                 Fecha:{" "}
                 {format(new Date(reclamo.fecha_creacion), "dd/MM/yyyy HH:mm")}
               </p>
-              {renderReclamoActions(reclamo)}              
-              <FirmaImagen clientId={reclamo.cliente_id} />
+              {renderReclamoActions(reclamo)}                     
             </div>
           ))
         ) : (

@@ -409,10 +409,11 @@ app.put("/reclamos/:id/firma", async (req, res) => {
 });
 
 app.get("/reclamos/firma/:cliente_id", async (req, res) => {
-  const {cliente_id} = req.params.id;
+  const { cliente_id } = req.params; // Cambié "req.params.id" por "req.params.cliente_id"
 
   try {
-    const [rows] = await db.query("SELECT firma FROM reclamos WHERE cliente_id = ?", cliente_id);
+    // Consultar la ruta de la firma en la base de datos usando el cliente_id
+    const [rows] = await db.query("SELECT firma FROM reclamos WHERE cliente_id = ?", [cliente_id]);
 
     if (rows.length === 0) {
       return res.status(404).json({ error: "Reclamo no encontrado" });
@@ -420,12 +421,12 @@ app.get("/reclamos/firma/:cliente_id", async (req, res) => {
 
     const filePath = rows[0].firma;
 
-    // Verificar si el archivo existe
+    // Verificar si el archivo existe en el servidor
     if (!fs.existsSync(filePath)) {
       return res.status(404).json({ error: "Firma no encontrada en el servidor" });
     }
 
-    // Enviar el archivo como respuesta
+    // Enviar el archivo como respuesta al cliente
     res.sendFile(path.resolve(filePath));
   } catch (error) {
     console.error("Error al obtener la firma:", error);
@@ -435,6 +436,7 @@ app.get("/reclamos/firma/:cliente_id", async (req, res) => {
     });
   }
 });
+
 
 // Iniciar servidor
 app.listen(PORT, () => {

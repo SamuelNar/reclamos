@@ -3,16 +3,16 @@ import { useState, useEffect } from 'react';
 // eslint-disable-next-line react/prop-types
 function FirmaImagen({ clientId }) {
   const [firma, setFirma] = useState(null);
-
   useEffect(() => {
     const fetchFirma = async () => {
       try {
-        const response = await fetch(`/reclamos/firma/${clientId}`);
-        const data = await response.json();
+        const response = await fetch(`/reclamos/firma/${clientId}`);     
+        console.log(response);  
         if (response.ok) {
-          setFirma(data.firma);
+          const imageUrl = URL.createObjectURL(await response.blob());
+          setFirma(imageUrl);
         } else {
-          console.error(data.error);
+          console.error("Ni idea");
         }
       } catch (error) {
         console.error("Error al obtener la firma:", error);
@@ -29,7 +29,7 @@ function FirmaImagen({ clientId }) {
   return (
     <div>
       <h2>Firma</h2>
-      <img src={`/${firma}`} alt="Firma" />
+      <img src={firma} alt="Firma" />
     </div>
   );
 }
