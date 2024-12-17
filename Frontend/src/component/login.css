@@ -18,6 +18,7 @@
   flex-direction: column;
   gap: 20px;
   transition: all 0.3s ease;
+  box-sizing: border-box; /* Ensure padding does not exceed width */
 }
 
 .login-container h2 {
@@ -47,6 +48,7 @@
   border-radius: 8px;
   font-size: 1rem;
   transition: all 0.3s ease;
+  box-sizing: border-box; /* Ensure input fields are contained within the form */
 }
 
 .input_username:focus,
@@ -87,6 +89,16 @@
   .login-container form {
     margin: 0 20px;
     padding: 30px 20px;
+    max-width: 100%; /* Ensure the form takes full width on small screens */
+  }
+
+  .input_username,
+  .input_password {
+    padding: 10px 15px; /* Adjust padding for smaller screens */
+  }
+
+  .login_button {
+    padding: 12px; /* Adjust button padding for smaller screens */
   }
 }
 
@@ -101,7 +113,6 @@
   transition: all 0.3s ease;
   margin-top: 10px;
 }
-
 
 .home_button_container {
   position: absolute;
