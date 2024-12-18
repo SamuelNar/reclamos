@@ -33,7 +33,7 @@ function CrearReclamo() {
       const token = localStorage.getItem("token");
       const decodedToken = JSON.parse(atob(token.split(".")[1]));
       setUserRole(decodedToken.rol);
-  
+
       try {
         if (decodedToken.rol === "cliente") {
           // Si el usuario es un cliente, obtener sus datos
@@ -63,13 +63,13 @@ function CrearReclamo() {
               },
             }
           );
-          
+
           if (!response.ok) {
             throw new Error("Error al obtener el cliente asociado al reclamo");
           }
-          
+
           const cliente = await response.json();
-          
+
           // Actualizar formData directamente
           setFormData((prev) => ({
             ...prev,
@@ -86,11 +86,11 @@ function CrearReclamo() {
               },
             }
           );
-          
+
           if (!response.ok) {
             throw new Error("Error al obtener la lista de clientes");
           }
-          
+
           const data = await response.json();
           setClientes(data);
         }
@@ -99,17 +99,17 @@ function CrearReclamo() {
         setError("No se pudo cargar la información del cliente.");
       }
     };
-  
+
     fetchClientes();
-  }, [reclamo,userRole]); // Dependencia solo de reclamo
-  
+  }, [reclamo, userRole]); // Dependencia solo de reclamo
+
   const handleChange = (e) => {
-    const { name, value } = e.target; 
+    const { name, value } = e.target;
     setFormData((prevFormData) => {
       // Mantén una copia del estado anterior
-      const updatedFormData = { 
-        ...prevFormData, 
-        [name]: value 
+      const updatedFormData = {
+        ...prevFormData,
+        [name]: value
       };
       if (reclamo) {
         updatedFormData.nombre = reclamo.nombre || updatedFormData.nombre;
@@ -160,7 +160,7 @@ function CrearReclamo() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(reclamoData),        
+        body: JSON.stringify(reclamoData),
       });
       if (!response.ok) {
         const errorData = await response.json();
@@ -283,9 +283,16 @@ function CrearReclamo() {
             <option value="en proceso">En Proceso</option>
             <option value="finalizado">Finalizado</option>
             <option value="eliminado">Eliminado</option>
-          </select>
-          
-              {reclamo && (
+          </select>          
+            <input
+              type="text"
+              name="sector"
+              value={formData.sector}
+              onChange={handleChange}
+              placeholder="Ingrese el sector"
+              required
+            />
+          {reclamo && (
             <select
               name="asignado"
               value={formData.asignado}
@@ -302,7 +309,7 @@ function CrearReclamo() {
               <option value="Agustin b">Agustin b</option>
               <option value="Matias">Matias</option>
             </select>
-          )}        
+          )}
           {error && <div className="error-message">{error}</div>}
           {success && <div className="success-message">{success}</div>}
 

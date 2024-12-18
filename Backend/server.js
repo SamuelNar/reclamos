@@ -196,12 +196,12 @@ app.post("/reclamos", authenticateToken, async (req, res) => {
     productoPersonalizado, 
     descripcion, 
     descripcionPersonalizada, 
-    importancia,
-    sector, 
+    importancia,    
     observaciones, 
     estado, 
     asignado, 
-    cliente_id 
+    cliente_id ,
+    sector
   } = req.body;
 
   // Validar campos obligatorios
@@ -222,9 +222,9 @@ app.post("/reclamos", authenticateToken, async (req, res) => {
     // Insertar el reclamo en la base de datos
     const [result] = await db.query(
       `INSERT INTO reclamos (
-        nombre, producto, descripcion, importancia,sector,observaciones, estado, asignado, cliente_id
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [nombre, finalProducto, finalDescripcion, importancia,sector,observaciones, estado, asignado, cliente_id]
+        nombre, producto, descripcion, importancia,observaciones, estado, asignado, cliente_id,sector
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [nombre, finalProducto, finalDescripcion, importancia,observaciones, estado, asignado, cliente_id,sector]
     );
 
     // Responder con el nuevo reclamo creado
