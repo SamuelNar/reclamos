@@ -258,7 +258,8 @@ app.put("/reclamos/:id", authenticateToken, async (req, res) => {
     observaciones,
     estado, 
     asignado,
-    cliente_id 
+    cliente_id,
+    sector
   } = req.body;
 
   const finalProducto = producto === 'otros' ? productoPersonalizado : producto;
@@ -271,7 +272,7 @@ app.put("/reclamos/:id", authenticateToken, async (req, res) => {
 
   try {
     const [result] = await db.query(
-      "UPDATE reclamos SET nombre = ?, producto = ?, descripcion = ?, importancia = ?, observaciones = ?, estado = ?, asignado = ?, cliente_id = ? WHERE id = ?",
+      "UPDATE reclamos SET nombre = ?, producto = ?, descripcion = ?, importancia = ?, observaciones = ?, estado = ?, asignado = ?, cliente_id = ? , sector = ? WHERE id = ?",
       [nombre, finalProducto, finalDescripcion, importancia, observaciones,estado, asignado,cliente_id,id]
     );
 
@@ -287,6 +288,7 @@ app.put("/reclamos/:id", authenticateToken, async (req, res) => {
       descripcion: finalDescripcion,
       importancia,
       estado,
+      sector,
       asignado
     });
   } catch (error) {
