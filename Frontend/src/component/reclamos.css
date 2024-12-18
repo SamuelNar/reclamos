@@ -64,7 +64,7 @@
 .create-button {
   background-color: var(--button-secondary);
   color: white;
-  margin-top: 20px;
+  margin-bottom: 20px;  
   display: block;
   margin-left: auto;
   margin-right: 0;

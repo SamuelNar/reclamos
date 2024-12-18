@@ -332,9 +332,13 @@ const Reclamos = ({ token, onLogout }) => {
           <button className="login-button" onClick={() => navigate("/login")}>
             Iniciar Sesión
           </button>
-        )}
+        )}        
       </div>
-
+      {(token && (role === "cliente" || role === "admin")) && (
+        <button className="create-button" onClick={() => navigate("/crear")}>
+          Crear Reclamo
+        </button>
+        )}
       {(role === 'admin' || role === 'tecnico') && (
         <div className="filters">
           <div className="status-filter">
@@ -435,12 +439,7 @@ const Reclamos = ({ token, onLogout }) => {
             <p>No hay reclamos registrados</p>
           </div>
         )}
-      </div>
-      {(token && (role === "cliente" || role === "admin")) && (
-        <button className="create-button" onClick={() => navigate("/crear")}>
-          Crear Reclamo
-        </button>
-      )}
+      </div>      
     </div>
   );
 };

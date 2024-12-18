@@ -8,7 +8,7 @@ function CrearReclamo() {
   const location = useLocation();
   const reclamo = location.state?.reclamo || null;
   const [formData, setFormData] = useState({
-    nombre: reclamo?.nombre || "", // Siempre debe ser un string
+    nombre: reclamo?.nombre || "",
     producto: reclamo?.producto || "",
     productoPersonalizado: "",
     descripcion: reclamo?.descripcion || "",
@@ -26,13 +26,16 @@ function CrearReclamo() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [userRole, setUserRole] = useState("");
+
   useEffect(() => {
     const fetchClientes = async () => {
       const token = localStorage.getItem("token");
       const decodedToken = JSON.parse(atob(token.split(".")[1]));
       setUserRole(decodedToken.rol);
-      if (decodedToken.rol === "cliente") {
-        try {
+  
+      try {
+        if (decodedToken.rol === "cliente") {
+          // Si el usuario es un cliente, obtener sus datos
           const response = await fetch(
             `https://reclamos-production-2298.up.railway.app/clientes/${decodedToken.id}`,
             {
@@ -43,40 +46,76 @@ function CrearReclamo() {
           );
           const cliente = await response.json();
           const clienteData = cliente[0];
+          // Actualizar formData directamente
           setFormData((prev) => ({
             ...prev,
             nombre: clienteData.nombre,
             cliente_id: clienteData.id,
-          }));         
-        } catch (error) {
-          console.log(error)
-        }
-      } else {
-        try {
+          }));
+        } else if (reclamo && reclamo.cliente_id) {
+          // Si hay un reclamo existente, obtener datos del cliente asociado
+          const response = await fetch(
+            `https://reclamos-production-2298.up.railway.app/clientes/${reclamo.cliente_id}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          
+          if (!response.ok) {
+            throw new Error("Error al obtener el cliente asociado al reclamo");
+          }
+          
+          const cliente = await response.json();
+          
+          // Actualizar formData directamente
+          setFormData((prev) => ({
+            ...prev,
+            nombre: cliente.nombre,
+            cliente_id: cliente.id,
+          }));
+        } else if (userRole !== "cliente") {
+          // Si no es un cliente y no hay reclamo, cargar lista de clientes
           const response = await fetch(
             "https://reclamos-production-2298.up.railway.app/clientes",
             {
               headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${token}`,
               },
             }
           );
+          
           if (!response.ok) {
             throw new Error("Error al obtener la lista de clientes");
           }
+          
           const data = await response.json();
           setClientes(data);
-        } catch (error) {
-          setError("No se pudo cargar la lista de clientes.", error);
         }
+      } catch (error) {
+        console.log(error);
+        setError("No se pudo cargar la información del cliente.");
       }
     };
+  
     fetchClientes();
-  }, []);
-
+  }, [reclamo,userRole]); // Dependencia solo de reclamo
+  
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const { name, value } = e.target; 
+    setFormData((prevFormData) => {
+      // Mantén una copia del estado anterior
+      const updatedFormData = { 
+        ...prevFormData, 
+        [name]: value 
+      };
+      if (reclamo) {
+        updatedFormData.nombre = reclamo.nombre || updatedFormData.nombre;
+        updatedFormData.cliente_id = reclamo.cliente_id || updatedFormData.cliente_id;
+      }
+      return updatedFormData;
+    });
 
     if (name === "producto") {
       if (value === "camara") {
@@ -95,7 +134,6 @@ function CrearReclamo() {
     setLoading(true);
     setError("");
     setSuccess("");
-
     const reclamoData = {
       ...formData,
       producto:
@@ -123,7 +161,6 @@ function CrearReclamo() {
         },
         body: JSON.stringify(reclamoData),        
       });
-      console.log(reclamoData);
       if (!response.ok) {
         const errorData = await response.json();
         console.error("Error del servidor:", errorData);
