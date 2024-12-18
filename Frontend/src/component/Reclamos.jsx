@@ -381,8 +381,8 @@ const Reclamos = ({ token, onLogout }) => {
               <p>Estado: {reclamo.estado}</p>
               <p>Producto: {reclamo.producto}</p>
               <p>Asignado: {reclamo.asignado || "No asignado"}</p>
-              <p>Importancia: {reclamo.importancia}</p>
-              <p>Cliente: {reclamo.cliente_id}</p>
+              <p>Importancia: {reclamo.importancia}</p>    
+              <p>Sector: {reclamo.sector || "No asignado"}</p>          
               <div className="observaciones-container">
                 <p>
                   Observaciones:{" "}

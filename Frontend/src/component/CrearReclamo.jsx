@@ -14,6 +14,7 @@ function CrearReclamo() {
     descripcion: reclamo?.descripcion || "",
     descripcionPersonalizada: "",
     importancia: reclamo?.importancia || "",
+    sector: reclamo?.sector || "",
     estado: reclamo?.estado || "",
     observaciones: reclamo?.observaciones || "Ingrese observaciones",
     asignado: reclamo?.asignado || "",
