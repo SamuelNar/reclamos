@@ -273,7 +273,7 @@ app.put("/reclamos/:id", authenticateToken, async (req, res) => {
   try {
     const [result] = await db.query(
       "UPDATE reclamos SET nombre = ?, producto = ?, descripcion = ?, importancia = ?, observaciones = ?, estado = ?, asignado = ?, cliente_id = ? , sector = ? WHERE id = ?",
-      [nombre, finalProducto, finalDescripcion, importancia, observaciones,estado, asignado,cliente_id,id]
+      [nombre, finalProducto, finalDescripcion, importancia, observaciones,estado, asignado,cliente_id,sector,id]
     );
 
     // Verificar si se actualizó algún registro
