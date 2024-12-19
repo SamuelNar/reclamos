@@ -6,21 +6,13 @@ import jwt from "jsonwebtoken";
 import cors from "cors";
 import fs from "fs";
 import nodemailer from "nodemailer";
-
-const transporter = nodemailer.createTransport({
-  host: 'c1910260.ferozo.com', // Reemplaza con el servidor SMTP de Ferozo
-  port: 465, // O el puerto que corresponda
-  secure: true, // true para el puerto 465, false para otros puertos
-  auth: {
-    user: 'snarvaja@lidercom.net.ar', // Tu dirección de correo
-    pass: 'S4mu3lN*' // Tu contraseña
-  }
-});
+import dotenv from 'dotenv';
+dotenv.config();
 
 // Configuración
 const app = express();
 const PORT = 3000;
-const SECRET_KEY = "clave_secreta";
+const SECRET_KEY = process.env.JWT_SECRET;;
 
 app.use(cors());
 // Middleware
@@ -28,17 +20,29 @@ app.use(bodyParser.json());
 app.use(express.json());
 
 const db = mysql.createPool({
-  host: "mysqlspring.cve2cg4quyaq.sa-east-1.rds.amazonaws.com",
-  user: "lidercom",
-  password: "123lidercom456",
-  database: "control",
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
 });
 
+
 const clientesDb = mysql.createPool({
-  host: "mysqlspring.cve2cg4quyaq.sa-east-1.rds.amazonaws.com",
-  user: "lidercom",
-  password: "123lidercom456",
-  database: "clientes",
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME2,
+});
+
+
+const transporter = nodemailer.createTransport({
+  host: process.env.HOST_EMAIL,
+  port: process.env.PORT,
+  secure: true,
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
+  }
 });
 
 const authenticateToken = (req, res, next) => {
@@ -239,7 +243,7 @@ app.post("/reclamos", authenticateToken, async (req, res) => {
     );
 
     const mailOptions = {
-      from: 'snarvaja@lidercom.net.ar',
+      from: process.env.EMAIL_USER,
       to: 'narvaja.torres@gmail.com', // Dirección de correo de Ferozo
       subject: 'Nuevo Reclamo Registrado',
       text: `Se ha registrado un nuevo reclamo en el sistema con el nombre: ${nombre}.`
