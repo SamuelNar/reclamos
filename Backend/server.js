@@ -5,6 +5,17 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import cors from "cors";
 import fs from "fs";
+import nodemailer from "nodemailer";
+
+const transporter = nodemailer.createTransport({
+  host: 'c1910260.ferozo.com', // Reemplaza con el servidor SMTP de Ferozo
+  port: 465, // O el puerto que corresponda
+  secure: true, // true para el puerto 465, false para otros puertos
+  auth: {
+    user: 'snarvaja@lidercom.net.ar', // Tu dirección de correo
+    pass: 'S4mu3lN*' // Tu contraseña
+  }
+});
 
 // Configuración
 const app = express();
@@ -226,6 +237,21 @@ app.post("/reclamos", authenticateToken, async (req, res) => {
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [nombre, finalProducto, finalDescripcion, importancia,observaciones, estado, asignado, cliente_id,sector]
     );
+
+    const mailOptions = {
+      from: 'snarvaja@lidercom.net.ar',
+      to: 'narvaja.torres@gmail.com', // Dirección de correo de Ferozo
+      subject: 'Nuevo Reclamo Registrado',
+      text: `Se ha registrado un nuevo reclamo en el sistema con el nombre: ${nombre}.`
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.log('Error al enviar el correo:', error);
+      } else {
+        console.log('Correo enviado:', info.response);
+      }
+    });
 
     // Responder con el nuevo reclamo creado
     res.status(201).json({
