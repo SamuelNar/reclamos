@@ -244,9 +244,11 @@ app.post("/reclamos", authenticateToken, async (req, res) => {
 
     const mailOptions = {
       from: process.env.EMAIL_USER,
-      to: 'narvaja.torres@gmail.com', // Dirección de correo de Ferozo
+      to: 'matiasenese@lidercom.net', 
       subject: 'Nuevo Reclamo Registrado',
-      text: `Se ha registrado un nuevo reclamo en el sistema con el nombre: ${nombre}.`
+      text: `Se ha registrado un nuevo reclamo en el sistema con el nombre: ${nombre},
+            el estado del reclamo es: ${estado} y la importancia es: ${importancia}.
+            El producto es ${finalProducto} y la descripción es: ${finalDescripcion}.`
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
