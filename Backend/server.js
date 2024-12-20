@@ -244,7 +244,7 @@ app.post("/reclamos", authenticateToken, async (req, res) => {
 
     const mailOptions = {
       from: process.env.EMAIL_USER,
-      to: 'matiasenese@lidercom.net', 
+      to: 'matiasenese@lidercom.net.ar', 
       subject: 'Nuevo Reclamo Registrado',
       text: `Se ha registrado un nuevo reclamo en el sistema con el nombre: ${nombre},
             el estado del reclamo es: ${estado} y la importancia es: ${importancia}.
