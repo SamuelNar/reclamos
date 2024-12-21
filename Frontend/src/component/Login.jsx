@@ -60,7 +60,7 @@ const Login = ({ onLogin }) => {
             type="text"
             placeholder="Ingrese su usuario"
             value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            onChange={(e) => setUsername(e.target.value.toLowerCase())}
             required
           />
         </div>
