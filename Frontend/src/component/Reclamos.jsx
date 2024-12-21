@@ -253,8 +253,19 @@ const Reclamos = ({ token, onLogout }) => {
 
   const renderReclamoActions = (reclamo) => {
     if (role === "admin") {
-      return (
+      return (               
+     
         <div className="reclamo-actions">
+          <div>
+          {reclamo.estado !== "finalizado" && reclamo.estado !== "eliminado" && (
+          <button
+            className="change-status-button"
+            onClick={() => changeReclamoStatus(reclamo.id, reclamo.estado)}
+          >
+            <FontAwesomeIcon icon={faSyncAlt} /> Cambiar Estado
+          </button>
+        )}
+          </div>           
           <button onClick={() => deleteReclamo(reclamo.id)}>
             <FontAwesomeIcon icon={faTrashAlt} /> Eliminar
           </button>
@@ -339,7 +350,7 @@ const Reclamos = ({ token, onLogout }) => {
           Crear Reclamo
         </button>
         )}
-      {(role === 'admin' || role === 'tecnico') && (
+      {(role === 'admin' || role === 'tecnico' || role === 'cliente') && (
         <div className="filters">
           <div className="status-filter">
             <label>Filtrar por estado:</label>

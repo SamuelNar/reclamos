@@ -430,6 +430,23 @@ app.put("/reclamos/:id/firma", async (req, res) => {
       return res.status(404).json({ error: "Reclamo no encontrado" });
     }
 
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: 'gdiaz@lidercom.net.ar', 
+      subject: 'Reclamo finalizado',
+      text: `Se ha finalizado un reclamo en el sistema con el nombre: ${nombre},
+            la importancia es: ${importancia},el producto es ${finalProducto} con las siguientes 
+            observaciones: ${observaciones}.` 
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.log('Error al enviar el correo:', error);
+      } else {
+        console.log('Correo enviado:', info.response);
+      }
+    });
+
     res.status(200).json({
       message: "Firma actualizada exitosamente",
       filePath,
