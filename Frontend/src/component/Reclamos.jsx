@@ -205,10 +205,10 @@ const Reclamos = ({ token, onLogout }) => {
         (reclamo.nombre && reclamo.nombre.toLowerCase().includes(searchTermLower)) ||
         (reclamo.importancia && reclamo.importancia.toLowerCase().includes(searchTermLower)) ||
         (reclamo.producto && reclamo.producto.toLowerCase().includes(searchTermLower)) ||
-        (reclamo.sector && reclamo.sector.toLowerCase().includes(searchTermLower))
+        (reclamo.sector && reclamo.sector.toLowerCase().includes(searchTermLower)) ||
+        (reclamo.asignado && reclamo.asignado.toLowerCase().includes(searchTermLower))
       );
-    }
-    
+    }    
     return true;
   });
 

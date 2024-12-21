@@ -104,17 +104,7 @@ function ChangePassword({ token, setIsPasswordChanged }) {
           <ul>
             <li style={{ color: passwordValidations.length ? "green" : "red" }}>
               Tener al menos 6 caracteres
-            </li>
-            <li
-              style={{ color: passwordValidations.hasLetter ? "green" : "red" }}
-            >
-              Incluir al menos una letra
-            </li>
-            <li
-              style={{ color: passwordValidations.hasNumber ? "green" : "red" }}
-            >
-              Incluir al menos un número
-            </li>
+            </li>               
           </ul>
         </div>
 

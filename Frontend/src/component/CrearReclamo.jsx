@@ -300,14 +300,13 @@ function CrearReclamo() {
               required
             >
               <option value="">Asignar a</option>
-              <option value="Samuel">Samuel</option>
-              <option value="Maxi">Maxi</option>
-              <option value="Joel">Joel</option>
-              <option value="Agustin">Agustin</option>
-              <option value="Silvio">Silvio</option>
-              <option value="Gabriel">Gabriel</option>
-              <option value="Agustin b">Agustin b</option>
-              <option value="Matias">Matias</option>
+              <option value="Samuel">Agustin G</option>
+              <option value="Maxi">Agustin P</option>
+              <option value="Joel">Gabriel</option>
+              <option value="Agustin">Gaston</option>
+              <option value="Silvio">Matias</option>
+              <option value="Gabriel">Maxi</option>
+              <option value="Agustin b">Samuel</option>              
             </select>
           )}
           {error && <div className="error-message">{error}</div>}
