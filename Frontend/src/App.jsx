@@ -92,7 +92,7 @@ function App() {
         }
       />
       <Route
-        path='/reclamos/perfil/:id'
+        path='/perfil/:id'
         element={
           <ProtectedRoute token={token}>
             <Perfil/>

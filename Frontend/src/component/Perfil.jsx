@@ -15,6 +15,7 @@ function Perfil() {
               throw new Error("Error al obtener el perfil");
             }
             const data = await response.json();
+            console.log(data);
             setPerfil(data[0]); // Asumiendo que el perfil es el primer elemento
           } catch (error) {
             setError(error.message);

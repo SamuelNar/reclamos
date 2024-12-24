@@ -348,7 +348,7 @@ const Reclamos = ({ token, onLogout }) => {
             Iniciar Sesión
           </button>
         )}  
-        <button className="" onClick={() => navigate("/reclamos/perfil/:id")}>
+        <button className="" onClick={() => navigate("/perfil/:id")}>
           Perfil  
         </button>      
       </div>

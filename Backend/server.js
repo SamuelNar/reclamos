@@ -191,6 +191,7 @@ app.get("/clientes", async (req, res) => {
       .json({ error: "Error al obtener clientes", details: error.message });
   }
 });
+
 app.get("/clientes/:id", async (req, res) => {
   const { id } = req.params;
   try {
@@ -489,10 +490,10 @@ app.get("/reclamos/firma/:cliente_id", async (req, res) => {
   }
 });
 
-app.get("/reclamos/perfil/:id"),async (req, res) => {  
+app.get("/perfil/:id"),async (req, res) => {  
   const { id } = req.params;
   try {
-    const [rows] = await clientesDb.query("SELECT nombre,cuit,direccion,localidad,provincia,telefono,email FROM cliente WHERE id = ?", [id]);
+    const [rows] = await clientesDb.query("SELECT nombre,cuit,direccion,localidad,provincia,telefono,email FROM cliente WHERE id = ?", id);
     res.status(200).json(rows);
   } catch (error) {
     res
