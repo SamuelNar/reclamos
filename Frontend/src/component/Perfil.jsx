@@ -1,61 +1,142 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-function Perfil() {    
-    const { id } = useParams(); // Obtiene el id desde la URL
-    const navigate = useNavigate(); // Para redirigir a otra ruta
-    const [perfil, setPerfil] = useState(null);
-    const [error, setError] = useState(null);
+import { useParams} from "react-router-dom";
+import API from "../utils/api";
 
-    useEffect(() => {
-        // Función para obtener los datos del perfil
-        const fetchPerfil = async () => {
-          try {
-            const response = await fetch(`/perfil/${id}`);  
-            console.log("Content-Type:", response.headers.get("Content-Type"));             
-            if (!response.ok) {
-              throw new Error("Error al obtener el perfil");
-            }    
-                
-            if (!response.headers.get("Content-Type").includes("application/json")) {
-              throw new Error("El servidor no devolvió JSON.");
-            }
-            
-            const data = await response.json();
-            console.log("Datos recibidos:", data);
-            setPerfil(data[0]); // Asumiendo que el perfil es el primer elemento
-          } catch (error) {
-            setError(error.message);
-          }
-        };
-    
-        fetchPerfil();
-      }, [id]);
-    
-      if (error) {
-        return <p>Error: {error}</p>;
-      }
-    
-      if (!perfil) {
-        return <p>Cargando perfil...</p>;
-      }
-    
-    
+function Perfil() {
+  const { id } = useParams(); // Obtiene el id desde la URL
+  const [perfil, setPerfil] = useState(null);
+  const [error, setError] = useState(null);
+  const [editMode, setEditMode] = useState(false); // Estado para manejar el modo de edición
+  const [formData, setFormData] = useState({
+    nombre: '',
+    cuit: '',
+    direccion: '',
+    localidad: '',
+    provincia: '',
+    telefono: '',
+    email: ''
+  });
 
-      return (
+  useEffect(() => {
+    // Función para obtener los datos del perfil
+    const fetchPerfil = async () => {
+      try {
+        const response = await API.get(`/perfil/${id}`);
+        console.log("Respuesta del servidor:", response);
+        console.log("Datos recibidos:", response.data);
+        setPerfil(response.data); // Asumiendo que el perfil es el primer elemento
+        setFormData(response.data); // Cargar los datos en el estado para el formulario
+      } catch (error) {
+        setError(error.message);
+      }
+    };
+
+    fetchPerfil();
+  }, [id]);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await API.put(`/perfil/${id}`, formData);
+      setPerfil(response.data); // Actualiza los datos del perfil con la respuesta
+      setEditMode(false); // Desactiva el modo de edición
+    } catch (error) {
+      setError("Error al actualizar perfil",error);
+    }
+  };
+
+  if (error) {
+    return <p>Error: {error}</p>;
+  }
+
+  if (!perfil) {
+    return <p>Cargando perfil...</p>;
+  }
+
+  return (
+    <div>
+      <h2>Perfil de Usuario</h2>
+      <form onSubmit={handleSubmit}>
+        <p><strong>Nombre:</strong> {perfil.nombre}</p>
+        
+        {/* Los demás campos solo se pueden editar si estamos en modo edición */}
         <div>
-          <h2>Perfil de Usuario</h2>
-          <p><strong>Nombre:</strong> {perfil.nombre}</p>
-          <p><strong>CUIT:</strong> {perfil.cuit}</p>
-          <p><strong>Dirección:</strong> {perfil.direccion}</p>
-          <p><strong>Localidad:</strong> {perfil.localidad}</p>
-          <p><strong>Provincia:</strong> {perfil.provincia}</p>
-          <p><strong>Teléfono:</strong> {perfil.telefono}</p>
-          <p><strong>Email:</strong> {perfil.email}</p>
-    
-          <button onClick={() => navigate(`/reclamos/perfil/${id}/editar`)}>Editar Perfil</button>
+          <label>CUIT:</label>
+          <input
+            type="text"
+            name="cuit"
+            value={formData.cuit}
+            disabled={!editMode} // Deshabilitar si no estamos en modo edición
+            onChange={handleInputChange}
+          />
         </div>
-      );
-    
+        <div>
+          <label>Dirección:</label>
+          <input
+            type="text"
+            name="direccion"
+            value={formData.direccion}
+            disabled={!editMode}
+            onChange={handleInputChange}
+          />
+        </div>
+        <div>
+          <label>Localidad:</label>
+          <input
+            type="text"
+            name="localidad"
+            value={formData.localidad}
+            disabled={!editMode}
+            onChange={handleInputChange}
+          />
+        </div>
+        <div>
+          <label>Provincia:</label>
+          <input
+            type="text"
+            name="provincia"
+            value={formData.provincia}
+            disabled={!editMode}
+            onChange={handleInputChange}
+          />
+        </div>
+        <div>
+          <label>Teléfono:</label>
+          <input
+            type="text"
+            name="telefono"
+            value={formData.telefono}
+            disabled={!editMode}
+            onChange={handleInputChange}
+          />
+        </div>
+        <div>
+          <label>Email:</label>
+          <input
+            type="email"
+            name="email"
+            value={formData.email}
+            disabled={!editMode}
+            onChange={handleInputChange}
+          />
+        </div>
+        
+        {editMode ? (
+          <button type="submit">Guardar cambios</button>
+        ) : (
+          <button type="button" onClick={() => setEditMode(true)}>Editar Perfil</button>
+        )}
+      </form>
+    </div>
+  );
 }
 
-export default Perfil
+export default Perfil;

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import PropTypes from 'prop-types';
 import SignatureCanvas from "react-signature-canvas";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -14,7 +15,6 @@ import API from "../utils/api";
 import { format } from "date-fns";
 import "./reclamos.css";
 
-// eslint-disable-next-line react/prop-types
 const Reclamos = ({ token, onLogout }) => {
   const [reclamos, setReclamos] = useState([]);
   const [role, setRole] = useState("");
@@ -61,7 +61,6 @@ const Reclamos = ({ token, onLogout }) => {
   const fetchRole = useCallback(() => {
     if (token) {
       try {
-        // eslint-disable-next-line react/prop-types
         const decodedToken = JSON.parse(atob(token.split(".")[1]));
         if (decodedToken?.rol) {
           setRole(decodedToken.rol);
@@ -86,7 +85,6 @@ const Reclamos = ({ token, onLogout }) => {
         });
         setReclamos(response.data);
       } else if (role === 'cliente') {
-        // eslint-disable-next-line react/prop-types
         const decodedToken = JSON.parse(atob(token.split('.')[1]));
         const userId = decodedToken.id;
         response = await API.get(`/reclamos/${userId}`, {
@@ -102,6 +100,24 @@ const Reclamos = ({ token, onLogout }) => {
     }
   }, [role, token]);
 
+  const getClienteId = () => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      const decodedToken = JSON.parse(atob(token.split(".")[1]));
+      return decodedToken.id;
+    }
+    return null;
+  }
+
+  const clienteId = getClienteId();
+
+  const handlePerfilRedirect = () => {
+    if (clienteId) {
+      navigate(`/perfil/${clienteId}`);
+    } else {
+      console.log("No se encontró el cliente_id en el token.");
+    }
+  };
 
   useEffect(() => {
     if (token) {
@@ -347,10 +363,8 @@ const Reclamos = ({ token, onLogout }) => {
           <button className="login-button" onClick={() => navigate("/login")}>
             Iniciar Sesión
           </button>
-        )}  
-        <button className="" onClick={() => navigate("/perfil/:id")}>
-          Perfil  
-        </button>      
+        )}
+        <button onClick={handlePerfilRedirect}>Perfil</button>         
       </div>
       {(token && (role === "cliente" || role === "admin")) && (
         <button className="create-button" onClick={() => navigate("/crear")}>
@@ -394,7 +408,7 @@ const Reclamos = ({ token, onLogout }) => {
               key={reclamo.id}
               className="reclamo-item"
               data-importancia={reclamo.importancia.toLowerCase()}
-            >
+            >              
               <h2>{reclamo.nombre}</h2>
               <p>Estado: {reclamo.estado}</p>
               <p>Producto: {reclamo.producto}</p>
@@ -460,6 +474,11 @@ const Reclamos = ({ token, onLogout }) => {
       </div>      
     </div>
   );
+};
+
+Reclamos.propTypes = {
+  token: PropTypes.string.isRequired,
+  onLogout: PropTypes.func.isRequired,
 };
 
 export default Reclamos;

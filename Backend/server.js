@@ -510,6 +510,41 @@ app.get("/perfil/:id", async (req, res) => {
     });
   }
 });
+
+app.put("/perfil/:id", async (req, res) => {
+  const { id } = req.params;
+  const { cuit, direccion, localidad, provincia, telefono, email } = req.body;
+  try {
+    // Actualizar los datos del perfil sin modificar el nombre
+    const [result] = await clientesDb.query(
+      "UPDATE cliente SET cuit = ?, direccion = ?, localidad = ?, provincia = ?, telefono = ?, email = ? WHERE id = ?",
+      [cuit, direccion, localidad, provincia, telefono, email, id]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "Perfil no encontrado" });
+    }
+
+    // Respuesta exitosa con los datos actualizados
+    res.status(200).json({
+      id,
+      cuit,
+      direccion,
+      localidad,
+      provincia,
+      telefono,
+      email,
+    });
+  } catch (error) {
+    console.error(error); // Para depurar el error en el servidor
+    res.status(500).json({
+      error: "Error al actualizar perfil",
+      details: error.message,
+    });
+  }
+});
+
+
 // Iniciar servidor
 app.listen(PORT, () => {
   console.log(`Servidor ejecutándose en http://localhost:${PORT}`);
