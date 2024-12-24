@@ -10,7 +10,9 @@ function Perfil() {
         // Función para obtener los datos del perfil
         const fetchPerfil = async () => {
           try {
-            const response = await fetch(`/reclamos/perfil/${id}`);
+            const response = await fetch(`/perfil/${id}`);
+            setPerfil(response.data);
+            console.log(response.data);
             if (!response.ok) {
               throw new Error("Error al obtener el perfil");
             }
