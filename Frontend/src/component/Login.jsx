@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import API from '../utils/api';
@@ -36,7 +35,7 @@ const Login = ({ onLogin }) => {
             navigate(`/reclamos`);
         } else {
             navigate('/'); // Ruta por defecto para otros roles
-        }                  
+        }                   
         onLogin(response.data.token);
       } else {
         setError('Respuesta del servidor inesperada');
@@ -48,14 +47,14 @@ const Login = ({ onLogin }) => {
   };
 
   return (
-    <div className="login-container">      
+    <div className="login-container">       
       <form onSubmit={handleSubmit}>
-
-        <h2>Iniciar Sesión</h2>
+        <img className='login-logo' src="assets/LogoLiderCom.webp" alt="Logo LiderCom" />  
+        <h2>Sistema de Reclamos</h2>
         <div className="form-group">
-          <label htmlFor="username">Usuario</label>
+          <label htmlFor="username">Ingrese su nombre de usuario</label>
           <input
-            className='input_username'
+            className="input-field"
             id="username"
             type="text"
             placeholder="Ingrese su usuario"
@@ -65,9 +64,9 @@ const Login = ({ onLogin }) => {
           />
         </div>
         <div className="form-group">
-          <label htmlFor="password">Contraseña</label>
+          <label htmlFor="password">Ingrese su contraseña</label>
           <input
-            className='input_password'
+            className="input-field"
             id="password"
             type="password"
             placeholder="Ingrese su contraseña"
@@ -76,7 +75,7 @@ const Login = ({ onLogin }) => {
             required
           />
         </div>
-        <button className='login_button' type="submit">Iniciar Sesión</button>        
+        <button className="login-btn" type="submit">Iniciar Sesión</button>        
         {error && <p className="error-message">{error}</p>}
       </form>
     </div>

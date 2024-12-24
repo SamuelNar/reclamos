@@ -355,6 +355,7 @@ const Reclamos = ({ token, onLogout }) => {
     <div className="reclamos-container">
       <div className="header">
         <h1>Reclamos LiderCom</h1>
+        <img className="header-img" src="/assets/LogoLiderCom.webp" alt="" />
         {token ? (
           <div className="user-actions">
           <button className="perfil-button" onClick={handlePerfilRedirect}>Perfil</button>
