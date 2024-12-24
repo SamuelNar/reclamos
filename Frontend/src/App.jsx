@@ -4,6 +4,7 @@ import Login from './component/Login';
 import Reclamos from './component/Reclamos';
 import CrearReclamo from './component/CrearReclamo';
 import ChangePassword from './component/ChangePassword';
+import Perfil from './component/Perfil';
 
 // Componente de ruta protegida
 // eslint-disable-next-line react/prop-types
@@ -88,6 +89,14 @@ function App() {
               }
             }}
           />
+        }
+      />
+      <Route
+        path='/reclamos/perfil/:id'
+        element={
+          <ProtectedRoute token={token}>
+            <Perfil/>
+          </ProtectedRoute>
         }
       />
     </Routes>

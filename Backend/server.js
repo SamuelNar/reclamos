@@ -489,7 +489,17 @@ app.get("/reclamos/firma/:cliente_id", async (req, res) => {
   }
 });
 
-
+app.get("/reclamos/perfil/:id"),async (req, res) => {  
+  const { id } = req.params;
+  try {
+    const [rows] = await clientesDb.query("SELECT nombre,cuit,direccion,localidad,provincia,telefono,email FROM cliente WHERE id = ?", [id]);
+    res.status(200).json(rows);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "Error al obtener reclamos", details: error.message });
+  }
+}
 // Iniciar servidor
 app.listen(PORT, () => {
   console.log(`Servidor ejecutándose en http://localhost:${PORT}`);

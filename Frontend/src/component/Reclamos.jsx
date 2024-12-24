@@ -347,7 +347,10 @@ const Reclamos = ({ token, onLogout }) => {
           <button className="login-button" onClick={() => navigate("/login")}>
             Iniciar Sesión
           </button>
-        )}        
+        )}  
+        <button className="" onClick={() => navigate("/reclamos/perfil/:id")}>
+          Perfil  
+        </button>      
       </div>
       {(token && (role === "cliente" || role === "admin")) && (
         <button className="create-button" onClick={() => navigate("/crear")}>
