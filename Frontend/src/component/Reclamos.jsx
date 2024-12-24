@@ -24,7 +24,7 @@ const Reclamos = ({ token, onLogout }) => {
   const [tempObservaciones, setTempObservaciones] = useState("");
   const [signatures, setSignatures] = useState({}); // Para almacenar firmas por reclamo
   const signaturePads = useRef({});  // Referencias para cada firma
- 
+
   const navigate = useNavigate();
   const handleLogout = useCallback(async () => {
     try {
@@ -224,7 +224,7 @@ const Reclamos = ({ token, onLogout }) => {
         (reclamo.sector && reclamo.sector.toLowerCase().includes(searchTermLower)) ||
         (reclamo.asignado && reclamo.asignado.toLowerCase().includes(searchTermLower))
       );
-    }    
+    }
     return true;
   });
 
@@ -273,19 +273,19 @@ const Reclamos = ({ token, onLogout }) => {
 
   const renderReclamoActions = (reclamo) => {
     if (role === "admin") {
-      return (               
-     
+      return (
+
         <div className="reclamo-actions">
           <div>
-          {reclamo.estado !== "finalizado" && reclamo.estado !== "eliminado" && (
-          <button
-            className="change-status-button"
-            onClick={() => changeReclamoStatus(reclamo.id, reclamo.estado)}
-          >
-            <FontAwesomeIcon icon={faSyncAlt} /> Cambiar Estado
-          </button>
-        )}
-          </div>           
+            {reclamo.estado !== "finalizado" && reclamo.estado !== "eliminado" && (
+              <button
+                className="change-status-button"
+                onClick={() => changeReclamoStatus(reclamo.id, reclamo.estado)}
+              >
+                <FontAwesomeIcon icon={faSyncAlt} /> Cambiar Estado
+              </button>
+            )}
+          </div>
           <button onClick={() => deleteReclamo(reclamo.id)}>
             <FontAwesomeIcon icon={faTrashAlt} /> Eliminar
           </button>
@@ -356,21 +356,21 @@ const Reclamos = ({ token, onLogout }) => {
       <div className="header">
         <h1>Reclamos LiderCom</h1>
         {token ? (
-          <button className="logout-button" onClick={handleLogout}>
-            Cerrar Sesión
-          </button>
+          <div className="user-actions">
+          <button className="perfil-button" onClick={handlePerfilRedirect}>Perfil</button>
+          <button className="logout-button" onClick={handleLogout}>Cerrar Sesión</button>
+        </div>
         ) : (
           <button className="login-button" onClick={() => navigate("/login")}>
             Iniciar Sesión
           </button>
         )}
-        <button onClick={handlePerfilRedirect}>Perfil</button>         
       </div>
       {(token && (role === "cliente" || role === "admin")) && (
         <button className="create-button" onClick={() => navigate("/crear")}>
           Crear Reclamo
         </button>
-        )}
+      )}
       {(role === 'admin' || role === 'tecnico' || role === 'cliente') && (
         <div className="filters">
           <div className="status-filter">
@@ -408,13 +408,13 @@ const Reclamos = ({ token, onLogout }) => {
               key={reclamo.id}
               className="reclamo-item"
               data-importancia={reclamo.importancia.toLowerCase()}
-            >              
+            >
               <h2>{reclamo.nombre}</h2>
               <p>Estado: {reclamo.estado}</p>
               <p>Producto: {reclamo.producto}</p>
               <p>Asignado: {reclamo.asignado || "No asignado"}</p>
-              <p>Importancia: {reclamo.importancia}</p>    
-              <p>Sector: {reclamo.sector || "No asignado"}</p>          
+              <p>Importancia: {reclamo.importancia}</p>
+              <p>Sector: {reclamo.sector || "No asignado"}</p>
               <div className="observaciones-container">
                 <p>
                   Observaciones:{" "}
@@ -463,7 +463,7 @@ const Reclamos = ({ token, onLogout }) => {
                 Fecha:{" "}
                 {format(new Date(reclamo.fecha_creacion), "dd/MM/yyyy HH:mm")}
               </p>
-              {renderReclamoActions(reclamo)}                     
+              {renderReclamoActions(reclamo)}
             </div>
           ))
         ) : (
@@ -471,7 +471,7 @@ const Reclamos = ({ token, onLogout }) => {
             <p>No hay reclamos registrados</p>
           </div>
         )}
-      </div>      
+      </div>
     </div>
   );
 };

@@ -1,12 +1,22 @@
 import { useState, useEffect } from "react";
-import { useParams} from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import API from "../utils/api";
-
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEdit } from "@fortawesome/free-solid-svg-icons";
+import "./perfil.css";
 function Perfil() {
   const { id } = useParams(); // Obtiene el id desde la URL
   const [perfil, setPerfil] = useState(null);
   const [error, setError] = useState(null);
-  const [editMode, setEditMode] = useState(false); // Estado para manejar el modo de edición
+  const navigate = useNavigate();
+  const [editMode, setEditMode] = useState({
+    cuit: false,
+    direccion: false,
+    localidad: false,
+    provincia: false,
+    telefono: false,
+    email: false,
+  });
   const [formData, setFormData] = useState({
     nombre: '',
     cuit: '',
@@ -14,7 +24,7 @@ function Perfil() {
     localidad: '',
     provincia: '',
     telefono: '',
-    email: ''
+    email: '',
   });
 
   useEffect(() => {
@@ -38,7 +48,14 @@ function Perfil() {
     const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
-      [name]: value
+      [name]: value,
+    }));
+  };
+
+  const handleEditClick = (field) => {
+    setEditMode((prevState) => ({
+      ...prevState,
+      [field]: true,
     }));
   };
 
@@ -47,9 +64,16 @@ function Perfil() {
     try {
       const response = await API.put(`/perfil/${id}`, formData);
       setPerfil(response.data); // Actualiza los datos del perfil con la respuesta
-      setEditMode(false); // Desactiva el modo de edición
+      setEditMode({
+        cuit: false,
+        direccion: false,
+        localidad: false,
+        provincia: false,
+        telefono: false,
+        email: false,
+      }); // Desactiva todos los modos de edición
     } catch (error) {
-      setError("Error al actualizar perfil",error);
+      setError("Error al actualizar perfil", error);
     }
   };
 
@@ -62,78 +86,125 @@ function Perfil() {
   }
 
   return (
-    <div>
-      <h2>Perfil de Usuario</h2>
-      <form onSubmit={handleSubmit}>
-        <p><strong>Nombre:</strong> {perfil.nombre}</p>
-        
-        {/* Los demás campos solo se pueden editar si estamos en modo edición */}
-        <div>
+    <div className="perfil-container">
+      <button className="perfil-btn" onClick={() => navigate("/")}>Inicio</button>
+      <h2 className="perfil-title">Perfil de Usuario</h2>
+      <form onSubmit={handleSubmit} className="perfil-form">
+        <p className="perfil-field">
+          <strong className="perfil-label">Nombre:</strong>
+          <span className="perfil-nombre">{perfil.nombre}</span>
+        </p>
+        <div className="perfil-field">
           <label>CUIT:</label>
-          <input
-            type="text"
-            name="cuit"
-            value={formData.cuit}
-            disabled={!editMode} // Deshabilitar si no estamos en modo edición
-            onChange={handleInputChange}
-          />
+          <div className="perfil-input-container">
+            <input
+              type="text"
+              name="cuit"
+              value={formData.cuit}
+              disabled={!editMode.cuit}
+              onChange={handleInputChange}
+              className="perfil-input"
+            />
+            {!editMode.cuit && (
+              <button type="button" onClick={() => handleEditClick('cuit')} className="perfil-edit-btn">
+                <FontAwesomeIcon icon={faEdit} />
+              </button>
+            )}
+          </div>
         </div>
-        <div>
+        <div className="perfil-field">
           <label>Dirección:</label>
-          <input
-            type="text"
-            name="direccion"
-            value={formData.direccion}
-            disabled={!editMode}
-            onChange={handleInputChange}
-          />
+          <div className="perfil-input-container">
+            <input
+              type="text"
+              name="direccion"
+              value={formData.direccion}
+              disabled={!editMode.direccion}
+              onChange={handleInputChange}
+              className="perfil-input"
+            />
+            {!editMode.direccion && (
+              <button type="button" onClick={() => handleEditClick('direccion')} className="perfil-edit-btn">
+                <FontAwesomeIcon icon={faEdit} />
+              </button>
+            )}
+          </div>
         </div>
-        <div>
+        <div className="perfil-field">
           <label>Localidad:</label>
-          <input
-            type="text"
-            name="localidad"
-            value={formData.localidad}
-            disabled={!editMode}
-            onChange={handleInputChange}
-          />
+          <div className="perfil-input-container">
+            <input
+              type="text"
+              name="localidad"
+              value={formData.localidad}
+              disabled={!editMode.localidad}
+              onChange={handleInputChange}
+              className="perfil-input"
+            />
+            {!editMode.localidad && (
+              <button type="button" onClick={() => handleEditClick('localidad')} className="perfil-edit-btn">
+                <FontAwesomeIcon icon={faEdit} />
+              </button>
+            )}
+          </div>
         </div>
-        <div>
+        <div className="perfil-field">
           <label>Provincia:</label>
-          <input
-            type="text"
-            name="provincia"
-            value={formData.provincia}
-            disabled={!editMode}
-            onChange={handleInputChange}
-          />
+          <div className="perfil-input-container">
+            <input
+              type="text"
+              name="provincia"
+              value={formData.provincia}
+              disabled={!editMode.provincia}
+              onChange={handleInputChange}
+              className="perfil-input"
+            />
+            {!editMode.provincia && (
+              <button type="button" onClick={() => handleEditClick('provincia')} className="perfil-edit-btn">
+                <FontAwesomeIcon icon={faEdit} />
+              </button>
+            )}
+          </div>
         </div>
-        <div>
+        <div className="perfil-field">
           <label>Teléfono:</label>
-          <input
-            type="text"
-            name="telefono"
-            value={formData.telefono}
-            disabled={!editMode}
-            onChange={handleInputChange}
-          />
+          <div className="perfil-input-container">
+            <input
+              type="text"
+              name="telefono"
+              value={formData.telefono}
+              disabled={!editMode.telefono}
+              onChange={handleInputChange}
+              className="perfil-input"
+            />
+            {!editMode.telefono && (
+              <button type="button" onClick={() => handleEditClick('telefono')} className="perfil-edit-btn">
+                <FontAwesomeIcon icon={faEdit} />
+              </button>
+            )}
+          </div>
         </div>
-        <div>
+        <div className="perfil-field">
           <label>Email:</label>
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            disabled={!editMode}
-            onChange={handleInputChange}
-          />
+          <div className="perfil-input-container">
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              disabled={!editMode.email}
+              onChange={handleInputChange}
+              className="perfil-input"
+            />
+            {!editMode.email && (
+              <button type="button" onClick={() => handleEditClick('email')} className="perfil-edit-btn">
+                <FontAwesomeIcon icon={faEdit} />
+              </button>
+            )}
+          </div>
         </div>
-        
-        {editMode ? (
-          <button type="submit">Guardar cambios</button>
-        ) : (
-          <button type="button" onClick={() => setEditMode(true)}>Editar Perfil</button>
-        )}
+
+        {/* Botón para guardar cambios */}
+        <button type="submit" className="perfil-submit-btn">Guardar cambios</button>
       </form>
     </div>
   );

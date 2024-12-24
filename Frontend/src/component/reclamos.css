@@ -61,6 +61,36 @@
   color: white;
 }
 
+.user-actions {
+  display: flex;
+  gap: 10px; /* Ajusta el espacio entre los botones */
+}
+
+.user-actions button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+}
+
+.perfil-button {
+  background-color: #3498db;  /* Azul suave */
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.perfil-button:hover {
+  background-color: #2980b9;  /* Azul más oscuro al pasar el cursor */
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
 .create-button {
   background-color: var(--button-secondary);
   color: white;
