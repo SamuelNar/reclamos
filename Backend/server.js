@@ -490,18 +490,26 @@ app.get("/reclamos/firma/:cliente_id", async (req, res) => {
   }
 });
 
-app.get("/perfil/:id"), async (req, res) => {  
-  const { id } = req.params; 
+app.get("/perfil/:id", async (req, res) => {
+  const { id } = req.params;
   try {
-    const [rows] = await clientesDb.query("SELECT * FROM cliente WHERE id = ?", id);
-    res.status(200).json(rows);
+    const [rows] = await clientesDb.query(
+      "SELECT nombre, cuit, direccion, localidad, provincia, telefono, email FROM cliente WHERE id = ?",
+      [id]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ error: "Perfil no encontrado" });
+    }
+    // Devolver el resultado como JSON
+    res.status(200).json(rows[0]);
   } catch (error) {
-    console.log("entro catch");
-    res
-      .status(500)
-      .json({ error: "Error al obtener reclamos", details: error.message });
+    res.status(500).json({
+      error: "Error al obtener perfil",
+      details: error.message,
+    });
   }
-}
+});
 // Iniciar servidor
 app.listen(PORT, () => {
   console.log(`Servidor ejecutándose en http://localhost:${PORT}`);

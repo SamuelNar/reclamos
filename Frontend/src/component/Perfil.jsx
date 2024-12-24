@@ -10,14 +10,18 @@ function Perfil() {
         // Función para obtener los datos del perfil
         const fetchPerfil = async () => {
           try {
-            const response = await fetch(`/perfil/${id}`);
-            setPerfil(response.data);
-            console.log(response.data);
+            const response = await fetch(`/perfil/${id}`);  
+            console.log("Content-Type:", response.headers.get("Content-Type"));             
             if (!response.ok) {
               throw new Error("Error al obtener el perfil");
+            }    
+                
+            if (!response.headers.get("Content-Type").includes("application/json")) {
+              throw new Error("El servidor no devolvió JSON.");
             }
+            
             const data = await response.json();
-            console.log(data);
+            console.log("Datos recibidos:", data);
             setPerfil(data[0]); // Asumiendo que el perfil es el primer elemento
           } catch (error) {
             setError(error.message);
