@@ -1,6 +1,7 @@
 /* eslint-disable react/prop-types */
 import { useState, useRef, useEffect } from 'react';
 import SignatureCanvas from 'react-signature-canvas';
+import API from '../utils/api';
 
 const FirmaVirtual = ({ reclamo, saveSignature, clearSignature, signatures }) => {
     const signaturePads = useRef({});
@@ -33,6 +34,46 @@ const FirmaVirtual = ({ reclamo, saveSignature, clearSignature, signatures }) =>
         };
     }, []);
 
+    // Función para convertir el lienzo en una imagen base64
+    const getBase64Signature = () => {
+        if (signaturePads.current[reclamo.id]) {
+            return signaturePads.current[reclamo.id].toDataURL();
+        }
+        return null;
+    };
+
+    // Función para guardar la firma
+    const handleSaveSignature = async () => {
+        const base64Signature = getBase64Signature();
+        if (!base64Signature) {
+            alert("Por favor, firme antes de guardar.");
+            return;
+        }
+
+        try {
+            // Llamar al backend para guardar la firma
+            const response = await API.put(`/reclamos/${reclamo.id}/firma`, {
+                firma: base64Signature,
+            });
+
+            if (response.data.fileUrl) {
+                // Guardar la URL de la firma en el estado
+                saveSignature(reclamo.id, response.data.fileUrl);
+            }
+        } catch (error) {
+            console.error("Error al guardar la firma:", error);
+            alert("Hubo un problema al guardar la firma.");
+        }
+    };
+
+    // Función para limpiar la firma
+    const handleClearSignature = () => {
+        if (signaturePads.current[reclamo.id]) {
+            signaturePads.current[reclamo.id].clear();
+            clearSignature(reclamo.id); // Limpiar la firma del estado
+        }
+    };
+
     return (
         reclamo.estado === "en proceso" && (
             <div className="signature-container">
@@ -45,10 +86,10 @@ const FirmaVirtual = ({ reclamo, saveSignature, clearSignature, signatures }) =>
                     canvasHeight={canvasDimensions.height}
                 />
                 <div className="signature-buttons">
-                    <button onClick={() => saveSignature(reclamo.id)}>
+                    <button onClick={handleSaveSignature}>
                         Guardar Firma
                     </button>
-                    <button onClick={() => clearSignature(reclamo.id)}>
+                    <button onClick={handleClearSignature}>
                         Limpiar Firma
                     </button>
                 </div>

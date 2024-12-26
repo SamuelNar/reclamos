@@ -4,27 +4,28 @@ import mysql from "mysql2/promise";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import cors from "cors";
-import { fileURLToPath } from 'url';
 import fs from "fs";
 import path from 'path';
 import nodemailer from "nodemailer";
 import dotenv from 'dotenv';
+import AWS from 'aws-sdk';
 dotenv.config();
-
 // Configuración
 const app = express();
 const PORT = 3000;
-const SECRET_KEY = process.env.JWT_SECRET;;
-
+const SECRET_KEY = process.env.JWT_SECRET;
 app.use(cors());
+AWS.config.update({
+  accessKeyId: process.env.ACCESS_KEY, 
+  secretAccessKey: process.env.SECRET_KEY, 
+  region: process.env.REGION, 
+});
+
+// Crea una instancia de S3
+const s3 = new AWS.S3();
 // Middleware
 app.use(bodyParser.json());
 app.use(express.json());
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Hacer la carpeta 'firmas' accesible públicamente
-app.use('/firmas', express.static(path.join(__dirname, 'firmas')));
 
 const db = mysql.createPool({
   host: process.env.DB_HOST,
@@ -250,6 +251,7 @@ app.post("/reclamos", authenticateToken, async (req, res) => {
       [nombre, finalProducto, finalDescripcion, importancia,observaciones, estado, asignado, cliente_id,sector]
     );
 
+    /*
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: 'gdiaz@lidercom.net.ar', 
@@ -265,7 +267,7 @@ app.post("/reclamos", authenticateToken, async (req, res) => {
       } else {
         console.log('Correo enviado:', info.response);
       }
-    });
+    });*/
 
     // Responder con el nuevo reclamo creado
     res.status(201).json({
@@ -410,22 +412,96 @@ app.patch("/reclamos/:id/estado", async (req, res) => {
   }
 });
 
+
+const uploadToS3 = async (filePath) => {
+  const fileName = path.basename(filePath);
+  
+  // Lee el archivo localmente
+  const fileContent = fs.readFileSync(filePath);
+
+  const params = {
+    Bucket: 'reclamoslidercom',
+    Key: `firmas/${fileName}`, 
+    Body: fileBuffer, 
+    ContentType: 'image/png', 
+    ACL: 'public-read', 
+  };
+
+  try {
+    const data = await s3.upload(params).promise();
+    console.log('Archivo subido exitosamente:', data.Location); 
+  } catch (error) {
+    console.error('Error al subir archivo:', error);
+  }
+};
+
+
 // Agregar firma al reclamo
 app.put("/reclamos/:id/firma", async (req, res) => {
   const { firma } = req.body; // Firma en formato base64
   const reclamoId = req.params.id;
-
   if (!firma) {
     return res.status(400).json({ error: "Firma es requerida" });
   }
 
   try {
-    const directory = "firmas";
+    // Convertir la firma base64 a un buffer
+    const base64Data = firma.replace(/^data:image\/png;base64,/, "");
+    const fileBuffer = Buffer.from(base64Data, "base64");
+
+    const fileName = `reclamo_${reclamoId}.png`;
+
+    // Subir la firma a S3
+    const fileUrl = await uploadToS3(fileBuffer, fileName);
+
+    // Actualizar la base de datos con la URL de la firma
+    const [result] = await db.query(
+      "UPDATE reclamos SET firma = ? WHERE id = ?",
+      [fileUrl, reclamoId]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "Reclamo no encontrado" });
+    }
+
+   /*
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: 'gdiaz@lidercom.net.ar', // Dirección de correo a donde enviarás el mensaje
+      subject: 'Reclamo finalizado',
+      text: `Se ha finalizado un reclamo en el sistema con el nombre: ${nombre}, 
+            la importancia es: ${importancia}, el producto es ${finalProducto} con las siguientes 
+            observaciones: ${observaciones}.` 
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.log('Error al enviar el correo:', error);
+      } else {
+        console.log('Correo enviado:', info.response);
+      }
+    });*/
+    res.status(200).json({
+      message: "Firma actualizada exitosamente",
+      fileUrl, // Incluye la URL del archivo subido a S3
+    });
+  } catch (error) {
+    console.error("Error al guardar la firma:", error);
+    res.status(500).json({
+      error: "Error al guardar la firma",
+      details: error.message,
+    });
+  }
+
+/*
+  try {
+ const directory = "firmas";
     if (!fs.existsSync(directory)) {
       fs.mkdirSync(directory, { recursive: true });
     }
     // Convertir la firma base64 a un archivo
     const base64Data = firma.replace(/^data:image\/png;base64,/, "");
+
     const filePath = `${directory}/reclamo_${reclamoId}.png`;
     fs.writeFileSync(filePath, base64Data, "base64");    
     // Actualizar la base de datos con la ruta de la firma
@@ -465,7 +541,8 @@ app.put("/reclamos/:id/firma", async (req, res) => {
       error: "Error al guardar la firma",
       details: error.message,
     });
-  }
+  }*/
+
 });
 
 app.get('/reclamos/firma/:cliente_id', async (req, res) => {

@@ -5,8 +5,6 @@ import Reclamos from './component/Reclamos';
 import CrearReclamo from './component/CrearReclamo';
 import ChangePassword from './component/ChangePassword';
 import Perfil from './component/Perfil';
-import FirmaImagen from './component/FirmaImagen';
-
 // Componente de ruta protegida
 // eslint-disable-next-line react/prop-types
 const ProtectedRoute = ({ token, children }) => {
@@ -40,6 +38,9 @@ function App() {
     localStorage.removeItem("userId");
   };
 
+  const handleBack = () => {
+    navigate('/');
+  }
 
   return (
     <Routes>
@@ -101,11 +102,13 @@ function App() {
         }
       />
       <Route
-        path='reclamos/firma/:id'
+        path='*'
         element={
-          <ProtectedRoute token={token}>
-            <FirmaImagen/>
-          </ProtectedRoute>
+          <div>
+            <h1>404</h1>
+            <p>Página no encontrada</p>
+            <button onClick={handleBack}>Volver al inicion</button>
+          </div>
         }
       />
     </Routes>

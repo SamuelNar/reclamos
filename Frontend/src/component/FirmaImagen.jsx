@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import API from '../utils/api';
 
 function FirmaImagen() {
-  const { id } = useParams(); // Obtiene el id desde la URL
+  const { cliente_id } = useParams(); // Obtiene el id desde la URL
   const [firmas, setFirmas] = useState([]); // Manejar múltiples firmas
   const [loading, setLoading] = useState(true); // Estado de carga
   const [error, setError] = useState(null); // Estado de error
@@ -11,7 +11,8 @@ function FirmaImagen() {
   useEffect(() => {
     const fetchFirmas = async () => {
       try {
-        const response = await API.get(`/reclamos/firma/${id}`);
+        const response = await API.get(`/reclamos/firma/${cliente_id}`);
+        console.log(response);
         if (response.status === 200) {
           const data = await response.json(); // Obtener JSON desde la respuesta
           setFirmas(data.firmas || []); // Establecer las firmas
@@ -27,7 +28,7 @@ function FirmaImagen() {
     };
 
     fetchFirmas();
-  }, [id]);
+  }, [cliente_id]);
 
   if (loading) {
     return <p>Cargando firmas...</p>;
