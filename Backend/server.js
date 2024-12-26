@@ -419,7 +419,6 @@ const uploadToS3 = async (fileBuffer, fileName) => {
     Key: `firmas/${fileName}`,
     Body: fileBuffer,
     ContentType: 'image/png',
-    ACL: 'public-read',
   };
 
   try {
