@@ -468,40 +468,38 @@ app.put("/reclamos/:id/firma", async (req, res) => {
   }
 });
 
-app.get("/reclamos/firma/:cliente_id", async (req, res) => {
+app.get('/reclamos/firma/:cliente_id', async (req, res) => {
   const { cliente_id } = req.params;
 
   try {
-    // Consultar todas las firmas asociadas al cliente_id
-    const [rows] = await db.query("SELECT firma FROM reclamos WHERE cliente_id = ?", [cliente_id]);
+    // Consultar las firmas de la base de datos
+    const [rows] = await db.query(
+      "SELECT firma FROM reclamos WHERE cliente_id = ?",
+      [cliente_id]
+    );
 
     if (rows.length === 0) {
-      console.log("No se encontraron reclamos para cliente_id:", cliente_id);
-      return res.status(404).json({ error: "No se encontraron firmas para el cliente" });
-    }
-    console.log("Firmas encontradas:", rows);
-    const firmas = rows.map(row => {
-      const filePath = path.resolve(row.firma);
-      if (fs.existsSync(filePath)) {
-        return filePath;
-      } else {
-        console.log("Archivo no encontrado en el servidor:", filePath);
-        return null;
-      }
-    }).filter(firma => firma !== null); // Filtrar rutas no válidas
-
-    if (firmas.length === 0) {
-      return res.status(404).json({ error: "Ninguna firma encontrada en el servidor" });
+      return res.status(404).json({ error: "No se encontraron firmas para este cliente" });
     }
 
-    // Enviar las rutas de los archivos como respuesta
-    res.status(200).json({ firmas });
+    // Filtrar las firmas que no son nulas y verificar si los archivos existen
+    const firmasValidas = rows
+      .filter(row => row.firma !== null)
+      .map(row => row.firma)
+      .filter(filePath => fs.existsSync(path.resolve(filePath)));
+
+    if (firmasValidas.length === 0) {
+      return res.status(404).json({ error: "No se encontraron firmas válidas en el servidor" });
+    }
+
+    // Construir las URLs de las firmas usando el dominio del backend en producción
+    const baseUrl = 'https://reclamos-production-2298.up.railway.app';
+    const firmasURLs = firmasValidas.map(firma => `${baseUrl}/firmas/${path.basename(firma)}`);
+
+    res.status(200).json({ firmas: firmasURLs });
   } catch (error) {
     console.error("Error al obtener las firmas:", error);
-    res.status(500).json({
-      error: "Error al obtener las firmas",
-      details: error.message,
-    });
+    res.status(500).json({ error: "Error al obtener las firmas", details: error.message });
   }
 });
 
