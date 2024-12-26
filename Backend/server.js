@@ -4,6 +4,7 @@ import mysql from "mysql2/promise";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import cors from "cors";
+import { fileURLToPath } from 'url';
 import fs from "fs";
 import path from 'path';
 import nodemailer from "nodemailer";
