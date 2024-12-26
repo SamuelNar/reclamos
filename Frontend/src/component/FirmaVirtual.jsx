@@ -37,7 +37,7 @@ const FirmaVirtual = ({ reclamo, saveSignature, clearSignature, signatures }) =>
     // Función para convertir el lienzo en una imagen base64
     const getBase64Signature = () => {
         if (signaturePads.current[reclamo.id]) {
-            return signaturePads.current[reclamo.id].toDataURL();
+            return signaturePads.current[reclamo.id].toDataURL('image/png');
         }
         return null;
     };
@@ -54,15 +54,17 @@ const FirmaVirtual = ({ reclamo, saveSignature, clearSignature, signatures }) =>
             // Llamar al backend para guardar la firma
             const response = await API.put(`/reclamos/${reclamo.id}/firma`, {
                 firma: base64Signature,
+                reclamoId: reclamo.id
             });
 
             if (response.data.fileUrl) {
                 // Guardar la URL de la firma en el estado
                 saveSignature(reclamo.id, response.data.fileUrl);
+                alert("Firma guardada exitosamente");
             }
         } catch (error) {
             console.error("Error al guardar la firma:", error);
-            alert("Hubo un problema al guardar la firma.");
+            alert("Error al guardar la firma. Por favor, intente nuevamente.");
         }
     };
 

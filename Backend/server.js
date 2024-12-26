@@ -8,21 +8,15 @@ import fs from "fs";
 import path from 'path';
 import nodemailer from "nodemailer";
 import dotenv from 'dotenv';
-import AWS from 'aws-sdk';
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 dotenv.config();
 // Configuración
 const app = express();
 const PORT = 3000;
 const SECRET_KEY = process.env.JWT_SECRET;
 app.use(cors());
-AWS.config.update({
-  accessKeyId: process.env.ACCESS_KEY, 
-  secretAccessKey: process.env.SECRET_KEY, 
-  region: process.env.REGION, 
-});
+const s3Client = new S3Client({ region: "sa-east-1" });
 
-// Crea una instancia de S3
-const s3 = new AWS.S3();
 // Middleware
 app.use(bodyParser.json());
 app.use(express.json());
@@ -413,25 +407,26 @@ app.patch("/reclamos/:id/estado", async (req, res) => {
 });
 
 
-const uploadToS3 = async (filePath) => {
-  const fileName = path.basename(filePath);
-  
-  // Lee el archivo localmente
-  const fileContent = fs.readFileSync(filePath);
-
+const uploadToS3 = async (fileBuffer, fileName) => {
   const params = {
     Bucket: 'reclamoslidercom',
-    Key: `firmas/${fileName}`, 
-    Body: fileBuffer, 
-    ContentType: 'image/png', 
-    ACL: 'public-read', 
+    Key: `firmas/${fileName}`,
+    Body: fileBuffer,
+    ContentType: 'image/png',
+    ACL: 'public-read',
   };
 
   try {
-    const data = await s3.upload(params).promise();
-    console.log('Archivo subido exitosamente:', data.Location); 
+    const command = new PutObjectCommand(params);
+    await s3Client.send(command);
+    
+    // Construir y retornar la URL del archivo
+    const fileUrl = `https://reclamoslidercom.s3.amazonaws.com/firmas/${fileName}`;
+    console.log('Archivo subido exitosamente:', fileUrl);
+    return fileUrl;
   } catch (error) {
     console.error('Error al subir archivo:', error);
+    throw error;
   }
 };
 
