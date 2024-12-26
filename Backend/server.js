@@ -15,7 +15,8 @@ const app = express();
 const PORT = 3000;
 const SECRET_KEY = process.env.JWT_SECRET;
 app.use(cors());
-const s3Client = new S3Client({ region: process.env.REGION,
+
+const s3Client = new S3Client({ region: "sa-east-1",
   credentials: {
     accessKeyId: process.env.ACCESS_KEY,
     secretAccessKey: process.env.SECRET_KEY
