@@ -479,8 +479,7 @@ app.get("/reclamos/firma/:cliente_id", async (req, res) => {
       console.log("No se encontraron reclamos para cliente_id:", cliente_id);
       return res.status(404).json({ error: "No se encontraron firmas para el cliente" });
     }
-
-    // Verificar que todas las rutas de archivos existan
+    console.log("Firmas encontradas:", rows);
     const firmas = rows.map(row => {
       const filePath = path.resolve(row.firma);
       if (fs.existsSync(filePath)) {
