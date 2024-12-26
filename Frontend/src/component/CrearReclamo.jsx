@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import "./crearReclamo.css";
+import "../assets/styles/CrearReclamo.css";
 import BuscadorCliente from "./BuscadorCliente";
 
 function CrearReclamo() {

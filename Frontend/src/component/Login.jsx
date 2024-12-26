@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import API from '../utils/api';
-import './login.css';
+import '../assets/styles/login.css';
 
 // eslint-disable-next-line react/prop-types
 const Login = ({ onLogin }) => {

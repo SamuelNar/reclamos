@@ -13,7 +13,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import API from "../utils/api";
 import { format } from "date-fns";
-import "./reclamos.css";
+import "../assets/styles/reclamos.css";
 
 const Reclamos = ({ token, onLogout }) => {
   const [reclamos, setReclamos] = useState([]);

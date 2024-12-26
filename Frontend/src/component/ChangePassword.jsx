@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import API from "../utils/api";
-import "./ChangePassword.css";
+import "../assets/styles/ChangePassword.css";
 // eslint-disable-next-line react/prop-types
 function ChangePassword({ token, setIsPasswordChanged }) {
   let { id } = useParams();

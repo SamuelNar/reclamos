@@ -5,6 +5,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import cors from "cors";
 import fs from "fs";
+import path from 'path';
 import nodemailer from "nodemailer";
 import dotenv from 'dotenv';
 dotenv.config();
@@ -18,6 +19,11 @@ app.use(cors());
 // Middleware
 app.use(bodyParser.json());
 app.use(express.json());
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Hacer la carpeta 'firmas' accesible públicamente
+app.use('/firmas', express.static(path.join(__dirname, 'firmas')));
 
 const db = mysql.createPool({
   host: process.env.DB_HOST,
@@ -462,33 +468,43 @@ app.put("/reclamos/:id/firma", async (req, res) => {
 });
 
 app.get("/reclamos/firma/:cliente_id", async (req, res) => {
-  const { cliente_id } = req.params; // Cambié "req.params.id" por "req.params.cliente_id"
+  const { cliente_id } = req.params;
 
   try {
-    // Consultar la ruta de la firma en la base de datos usando el cliente_id
+    // Consultar todas las firmas asociadas al cliente_id
     const [rows] = await db.query("SELECT firma FROM reclamos WHERE cliente_id = ?", [cliente_id]);
 
     if (rows.length === 0) {
-      return res.status(404).json({ error: "Reclamo no encontrado" });
+      console.log("No se encontraron reclamos para cliente_id:", cliente_id);
+      return res.status(404).json({ error: "No se encontraron firmas para el cliente" });
     }
 
-    const filePath = rows[0].firma;
+    // Verificar que todas las rutas de archivos existan
+    const firmas = rows.map(row => {
+      const filePath = path.resolve(row.firma);
+      if (fs.existsSync(filePath)) {
+        return filePath;
+      } else {
+        console.log("Archivo no encontrado en el servidor:", filePath);
+        return null;
+      }
+    }).filter(firma => firma !== null); // Filtrar rutas no válidas
 
-    // Verificar si el archivo existe en el servidor
-    if (!fs.existsSync(filePath)) {
-      return res.status(404).json({ error: "Firma no encontrada en el servidor" });
+    if (firmas.length === 0) {
+      return res.status(404).json({ error: "Ninguna firma encontrada en el servidor" });
     }
 
-    // Enviar el archivo como respuesta al cliente
-    res.sendFile(path.resolve(filePath));
+    // Enviar las rutas de los archivos como respuesta
+    res.status(200).json({ firmas });
   } catch (error) {
-    console.error("Error al obtener la firma:", error);
+    console.error("Error al obtener las firmas:", error);
     res.status(500).json({
-      error: "Error al obtener la firma",
+      error: "Error al obtener las firmas",
       details: error.message,
     });
   }
 });
+
 
 app.get("/perfil/:id", async (req, res) => {
   const { id } = req.params;

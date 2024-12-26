@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import API from "../utils/api";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit } from "@fortawesome/free-solid-svg-icons";
-import "./perfil.css";
+import "../assets/styles/perfil.css";
 function Perfil() {
   const { id } = useParams(); // Obtiene el id desde la URL
   const [perfil, setPerfil] = useState(null);

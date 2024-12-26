@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import "./buscador.css";
+import "../assets/styles/buscador.css";
 
 // eslint-disable-next-line react/prop-types
 function BuscadorCliente({ clientes, formData, setFormData }) {
