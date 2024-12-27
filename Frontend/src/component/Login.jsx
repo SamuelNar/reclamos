@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import PropTypes from 'prop-types';
+import { useNavigate, Link } from 'react-router-dom'; // Importar Link para el enlace
 import API from '../utils/api';
 import '../assets/styles/login.css';
 
-// eslint-disable-next-line react/prop-types
 const Login = ({ onLogin }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -26,9 +26,7 @@ const Login = ({ onLogin }) => {
         const userId = decodedToken?.id;
         const userRole = decodedToken?.rol;
         localStorage.setItem('userId', userId);        
-        // Si necesita cambiar contraseña, redirigir a /change-password/:id
         if (decodedToken?.password === "123123" || decodedToken?.first_login) {
-          // Redirigir a la ruta de cambio de contraseña con el ID
           navigate(`/change-password/${decodedToken.id}`);
         }              
         if (userRole === "cliente") {
@@ -75,11 +73,20 @@ const Login = ({ onLogin }) => {
             required
           />
         </div>
-        <button className="login-btn" type="submit">Iniciar Sesión</button>        
+        <button className="login-btn" type="submit">Iniciar Sesión</button>
         {error && <p className="error-message">{error}</p>}
+
+        {/* Enlace para la recuperación de contraseña */}
+        <p className="forgot-password">
+          ¿Olvidaste tu contraseña? <Link to="/forgot-password">Recupérala aquí</Link>
+        </p>
       </form>
     </div>
   );
+};
+
+Login.propTypes = {
+  onLogin: PropTypes.func.isRequired,
 };
 
 export default Login;

@@ -317,10 +317,11 @@ const Reclamos = ({ token, onLogout }) => {
       );
     }
 
-    if (role === 'cliente') {
+    if (role === 'cliente') {   
+      const mostrarFirma = reclamo.estado === "en proceso" && !signatures[reclamo.id];
       return (
-        reclamo.estado === "en proceso" && (
-          <div className="signature-container">
+        mostrarFirma && (
+          <div className={`signature-container ${signatures[reclamo.id] ? 'signed' : ''} ${mostrarFirma ? 'show-signature' : ''}`}>
             <h3>Firma Virtual</h3>
             <SignatureCanvas
               ref={(ref) => (signaturePads.current[reclamo.id] = ref)}
@@ -358,7 +359,7 @@ const Reclamos = ({ token, onLogout }) => {
         <img className="header-img" src="/assets/LogoLiderCom.webp" alt="" />
         {token ? (
           <div className="user-actions">
-          <button className="perfil-button" onClick={handlePerfilRedirect}>Perfil</button>
+          {role === 'cliente' && <button className="perfil-button" onClick={handlePerfilRedirect}>Perfil</button>}
           <button className="logout-button" onClick={handleLogout}>Cerrar Sesión</button>
         </div>
         ) : (

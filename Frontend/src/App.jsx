@@ -5,6 +5,8 @@ import Reclamos from './component/Reclamos';
 import CrearReclamo from './component/CrearReclamo';
 import ChangePassword from './component/ChangePassword';
 import Perfil from './component/Perfil';
+import FormRecover from './component/FormRecover';
+import ResetPassword from './component/ResetPassword';
 // Componente de ruta protegida
 // eslint-disable-next-line react/prop-types
 const ProtectedRoute = ({ token, children }) => {
@@ -111,6 +113,8 @@ function App() {
           </div>
         }
       />
+      <Route path="/forgot-password" element={<FormRecover />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
     </Routes>
   );
 }

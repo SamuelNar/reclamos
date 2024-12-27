@@ -17,8 +17,8 @@ function Perfil() {
     telefono: false,
     email: false,
   });
-  const [formData, setFormData] = useState({
-    nombre: '',
+  const [formData, setFormData] = useState({    
+    nombre: '', 
     cuit: '',
     direccion: '',
     localidad: '',
@@ -26,16 +26,16 @@ function Perfil() {
     telefono: '',
     email: '',
   });
+  const [originalNombre, setOriginalNombre] = useState(''); 
 
   useEffect(() => {
     // Función para obtener los datos del perfil
     const fetchPerfil = async () => {
       try {
-        const response = await API.get(`/perfil/${id}`);
-        console.log("Respuesta del servidor:", response);
-        console.log("Datos recibidos:", response.data);
+        const response = await API.get(`/perfil/${id}`);                    
         setPerfil(response.data); // Asumiendo que el perfil es el primer elemento
-        setFormData(response.data); // Cargar los datos en el estado para el formulario
+        setFormData(response.data); // Cargar los datos en el estado para el formulario             
+        setOriginalNombre(response.data.nombre);
       } catch (error) {
         setError(error.message);
       }
@@ -61,9 +61,12 @@ function Perfil() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const response = await API.put(`/perfil/${id}`, formData);
+    try {             
+      const response = await API.put(`/perfil/${id}`, formData);      
       setPerfil(response.data); // Actualiza los datos del perfil con la respuesta
+      setFormData(        
+         response.data,        
+      );     
       setEditMode({
         cuit: false,
         direccion: false,
@@ -92,7 +95,7 @@ function Perfil() {
       <form onSubmit={handleSubmit} className="perfil-form">
         <p className="perfil-field">
           <strong className="perfil-label">Nombre:</strong>
-          <span className="perfil-nombre">{perfil.nombre}</span>
+          <span className="perfil-nombre">{originalNombre}</span>
         </p>
         <div className="perfil-field">
           <label>CUIT:</label>
@@ -203,7 +206,6 @@ function Perfil() {
           </div>
         </div>
 
-        {/* Botón para guardar cambios */}
         <button type="submit" className="perfil-submit-btn">Guardar cambios</button>
       </form>
     </div>

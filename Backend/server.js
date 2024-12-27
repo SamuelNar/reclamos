@@ -251,7 +251,6 @@ app.post("/reclamos", authenticateToken, async (req, res) => {
       [nombre, finalProducto, finalDescripcion, importancia,observaciones, estado, asignado, cliente_id,sector]
     );
 
-    /*
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: 'gdiaz@lidercom.net.ar', 
@@ -267,7 +266,7 @@ app.post("/reclamos", authenticateToken, async (req, res) => {
       } else {
         console.log('Correo enviado:', info.response);
       }
-    });*/
+    });
 
     // Responder con el nuevo reclamo creado
     res.status(201).json({
@@ -464,7 +463,6 @@ app.put("/reclamos/:id/firma", async (req, res) => {
       return res.status(404).json({ error: "Reclamo no encontrado" });
     }
 
-   /*
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: 'gdiaz@lidercom.net.ar', // Dirección de correo a donde enviarás el mensaje
@@ -473,14 +471,13 @@ app.put("/reclamos/:id/firma", async (req, res) => {
             la importancia es: ${importancia}, el producto es ${finalProducto} con las siguientes 
             observaciones: ${observaciones}.` 
     };
-
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
         console.log('Error al enviar el correo:', error);
       } else {
         console.log('Correo enviado:', info.response);
       }
-    });*/
+    });
     res.status(200).json({
       message: "Firma actualizada exitosamente",
       fileUrl, // Incluye la URL del archivo subido a S3
@@ -492,56 +489,6 @@ app.put("/reclamos/:id/firma", async (req, res) => {
       details: error.message,
     });
   }
-
-/*
-  try {
- const directory = "firmas";
-    if (!fs.existsSync(directory)) {
-      fs.mkdirSync(directory, { recursive: true });
-    }
-    // Convertir la firma base64 a un archivo
-    const base64Data = firma.replace(/^data:image\/png;base64,/, "");
-
-    const filePath = `${directory}/reclamo_${reclamoId}.png`;
-    fs.writeFileSync(filePath, base64Data, "base64");    
-    // Actualizar la base de datos con la ruta de la firma
-    const [result] = await db.query(
-      "UPDATE reclamos SET firma = ? WHERE id = ?",
-      [filePath, reclamoId]
-    );
-
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ error: "Reclamo no encontrado" });
-    }
-
-    const mailOptions = {
-      from: process.env.EMAIL_USER,
-      to: 'gdiaz@lidercom.net.ar', 
-      subject: 'Reclamo finalizado',
-      text: `Se ha finalizado un reclamo en el sistema con el nombre: ${nombre},
-            la importancia es: ${importancia},el producto es ${finalProducto} con las siguientes 
-            observaciones: ${observaciones}.` 
-    };
-
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.log('Error al enviar el correo:', error);
-      } else {
-        console.log('Correo enviado:', info.response);
-      }
-    });
-
-    res.status(200).json({
-      message: "Firma actualizada exitosamente",
-      filePath,
-    });
-  } catch (error) {
-    console.error("Error al guardar la firma:", error);
-    res.status(500).json({
-      error: "Error al guardar la firma",
-      details: error.message,
-    });
-  }*/
 
 });
 
@@ -635,6 +582,56 @@ app.put("/perfil/:id", async (req, res) => {
   }
 });
 
+
+app.post('/password-request', async (req, res) => {
+  const { email } = req.body;
+
+  const usuario = db.query("SELECT * FROM usuarios WHERE email = ?", [email]);
+  
+  if ( usuario.length === 0) {
+    return res.status(404).json({ error: 'Usuario no encontrado' });
+  }
+
+  const resetToken = jwt.sign({ email }, JWT_SECRET, { expiresIn: "1h" });
+
+  const resetLink = `https://reclamos-production-2298.up.railway.app/reset-password?token=${resetToken}`;
+  await transporter.sendMail({
+    from: `"Soporte" ${process.env.EMAIL_USER}`,
+    to: email,
+    subject: 'Recuperación de contraseña',
+    text: `Haz clic en el siguiente enlace para restablecer tu contraseña: ${resetLink}`,
+    html: `<p>Haz clic en el siguiente enlace para restablecer tu contraseña:</p><a href="${resetLink}">${resetLink}</a>`,
+  });
+
+  res.json({ message: 'Si el email está registrado, se ha enviado un correo de recuperación.' });
+
+});
+
+app.post('/reset-password', async (req, res) => {
+  const { token, newPassword } = req.body;
+
+  try {
+    // Verificar el token
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const { email } = decoded;
+
+    const usuario = await db.query("SELECT * FROM usuarios WHERE email = ?", [email]);
+    if (usuario.length === 0) {
+      return res.status(404).json({ error: 'Usuario no encontrado.' });
+    }
+
+    // Actualizar la contraseña
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await db.query("UPDATE usuarios SET password = ? WHERE email = ?", [hashedPassword, email]);
+
+    res.json({ message: 'Contraseña actualizada con éxito.' });
+  } catch (error) {
+    if (err.name === 'TokenExpiredError') {
+      return res.status(400).json({ error: 'El token ha expirado.' });
+    }
+    return res.status(400).json({ error: 'Token inválido.' });
+  }
+});
 
 // Iniciar servidor
 app.listen(PORT, () => {
