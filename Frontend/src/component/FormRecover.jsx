@@ -7,6 +7,7 @@ function FormRecover() {
     const [email, setEmail] = useState('');
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
+    
     const navigate = useNavigate();
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -14,7 +15,9 @@ function FormRecover() {
         setError('');
         try {
             const response = await API.post('/password-request', { email });
-            if (response.status === 200) {
+            {
+                   /* API.post('/password-request', { email })
+                     if (response.status === 200) {
                 setMessage('Si el email está registrado, se ha enviado un enlace de recuperación.');
                 setTimeout(() => {
                     navigate('/'); // Redirige al usuario al login después de 5 segundos
@@ -22,6 +25,12 @@ function FormRecover() {
               } else {
                 setError('Ocurrió un error inesperado, por favor intenta de nuevo.');
               }
+                */
+            }  
+            setMessage(response.data.message);  
+            setTimeout(() => {
+                navigate('/login'); // Redirige al usuario al login después de 5 segundos
+              }, 5000);       
         } catch (err) {
             console.error('Error en la recuperación de contraseña:', err);
             setError(err.response?.data?.error || 'Ocurrió un error, por favor intenta de nuevo.');

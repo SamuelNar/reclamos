@@ -1,42 +1,57 @@
-import { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import API from '../utils/api';
 import '../assets/styles/resetPassword.css';
 
 const ResetPassword = () => {
+  const { token } = useParams();  // El token se pasa como parte de la URL
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false); // Para manejar el estado de carga
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const token = searchParams.get('token'); // Obtener el token de la URL
+
+  useEffect(() => {
+    if (!token) {
+      navigate('/login'); // Si el token no existe, redirigir
+    }
+  }, [token, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage('');
     setError('');
-
+    
+    // Validaciones adicionales
     if (newPassword !== confirmPassword) {
       setError('Las contraseñas no coinciden.');
       return;
     }
+
+    if (newPassword.length < 6) {
+      setError('La contraseña debe tener al menos 6 caracteres.');
+      return;
+    }
+
+    setIsLoading(true); // Mostrar el loader mientras se hace la solicitud
 
     try {
       // Enviar la solicitud al backend para cambiar la contraseña
       const response = await API.post('/reset-password', { token, newPassword });
 
       if (response.status === 200) {
-        setMessage('Contraseña actualizada con éxito.');
-        setTimeout(() => {
-          navigate('/'); // Redirige al login después de 3 segundos
-        }, 3000);
+        setMessage(response.data.message);
+        // Redirigir al login o a una página adecuada
+        setTimeout(() => navigate('/login'), 2000);
       } else {
         setError('Ocurrió un error inesperado.');
       }
     } catch (err) {
       console.error('Error al cambiar la contraseña:', err);
       setError(err.response?.data?.error || 'Token inválido o expirado.');
+    } finally {
+      setIsLoading(false); // Ocultar el loader después de la respuesta
     }
   };
 
@@ -45,6 +60,7 @@ const ResetPassword = () => {
       <form onSubmit={handleSubmit}>
         <h2>Cambiar Contraseña</h2>
         <p>Introduce una nueva contraseña para tu cuenta.</p>
+        
         <div className="form-group">
           <label htmlFor="new-password">Nueva Contraseña</label>
           <input
@@ -57,6 +73,7 @@ const ResetPassword = () => {
             required
           />
         </div>
+        
         <div className="form-group">
           <label htmlFor="confirm-password">Confirmar Contraseña</label>
           <input
@@ -69,7 +86,10 @@ const ResetPassword = () => {
             required
           />
         </div>
-        <button className="submit-btn" type="submit">Actualizar Contraseña</button>
+        
+        <button className="submit-btn" type="submit" disabled={isLoading}>
+          {isLoading ? 'Cargando...' : 'Actualizar Contraseña'}
+        </button>
 
         {/* Mostrar mensajes de éxito o error */}
         {message && <p className="success-message">{message}</p>}

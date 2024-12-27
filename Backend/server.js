@@ -14,11 +14,7 @@ dotenv.config();
 const app = express();
 const PORT = 3000;
 const SECRET_KEY = process.env.JWT_SECRET;
-app.use(cors({
-  origin: 'http://localhost:5173', // Permitir solicitudes de localhost
-  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Métodos permitidos
-  allowedHeaders: ['Content-Type', 'Authorization'], // Cabeceras permitidas
-}));
+app.use(cors());
 
 const s3Client = new S3Client({ region: "sa-east-1",
   credentials: {
@@ -598,7 +594,10 @@ app.post('/password-request', async (req, res) => {
 
   const resetToken = jwt.sign({ email }, JWT_SECRET, { expiresIn: "1h" });
 
+  await db.query("UPDATE usuarios SET token = ? WHERE email = ?", [resetToken, email]);
+
   const resetLink = `https://reclamos-production-2298.up.railway.app/reset-password?token=${resetToken}`;
+
   await transporter.sendMail({
     from: `"Soporte" ${process.env.EMAIL_USER}`,
     to: email,
@@ -623,10 +622,12 @@ app.post('/reset-password', async (req, res) => {
     if (usuario.length === 0) {
       return res.status(404).json({ error: 'Usuario no encontrado.' });
     }
+    if (usuario[0].token !== token) {
+      return res.status(400).json({ error: 'Token inválido.' });
+    }
 
-    // Actualizar la contraseña
     const hashedPassword = await bcrypt.hash(newPassword, 10);
-    await db.query("UPDATE usuarios SET password = ? WHERE email = ?", [hashedPassword, email]);
+    await db.query("UPDATE usuarios SET password = ?, reset_token = NULL WHERE email = ?", [hashedPassword, email]);
 
     res.json({ message: 'Contraseña actualizada con éxito.' });
   } catch (error) {
