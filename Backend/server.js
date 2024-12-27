@@ -609,7 +609,7 @@ app.post('/password-request', async (req, res) => {
 
   await db.query("UPDATE usuarios SET token = ? WHERE email = ?", [resetToken, email]);
 
-  const resetLink = `https://reclamos-production-2298.up.railway.app/reset-password?token=${resetToken}`;
+  const resetLink = `http://localhost:5173/reset-password?token=${resetToken}`;
 
   await transporter.sendMail({
     from: `"Soporte" ${process.env.EMAIL_USER}`,

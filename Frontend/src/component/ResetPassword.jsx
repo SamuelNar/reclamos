@@ -1,20 +1,21 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import API from '../utils/api';
 import '../assets/styles/resetPassword.css';
 
 const ResetPassword = () => {
-  const { token } = useParams();  // El token se pasa como parte de la URL
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get('token');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false); // Para manejar el estado de carga
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     if (!token) {
-      navigate('/login'); // Si el token no existe, redirigir
+      navigate('/login');
     }
   }, [token, navigate]);
 
@@ -23,7 +24,6 @@ const ResetPassword = () => {
     setMessage('');
     setError('');
     
-    // Validaciones adicionales
     if (newPassword !== confirmPassword) {
       setError('Las contraseñas no coinciden.');
       return;
@@ -34,15 +34,13 @@ const ResetPassword = () => {
       return;
     }
 
-    setIsLoading(true); // Mostrar el loader mientras se hace la solicitud
+    setIsLoading(true);
 
     try {
-      // Enviar la solicitud al backend para cambiar la contraseña
       const response = await API.post('/reset-password', { token, newPassword });
 
       if (response.status === 200) {
         setMessage(response.data.message);
-        // Redirigir al login o a una página adecuada
         setTimeout(() => navigate('/login'), 2000);
       } else {
         setError('Ocurrió un error inesperado.');
@@ -51,7 +49,7 @@ const ResetPassword = () => {
       console.error('Error al cambiar la contraseña:', err);
       setError(err.response?.data?.error || 'Token inválido o expirado.');
     } finally {
-      setIsLoading(false); // Ocultar el loader después de la respuesta
+      setIsLoading(false);
     }
   };
 
@@ -91,7 +89,6 @@ const ResetPassword = () => {
           {isLoading ? 'Cargando...' : 'Actualizar Contraseña'}
         </button>
 
-        {/* Mostrar mensajes de éxito o error */}
         {message && <p className="success-message">{message}</p>}
         {error && <p className="error-message">{error}</p>}
       </form>
