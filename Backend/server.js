@@ -644,12 +644,11 @@ app.post('/password-request', async (req, res) => {
 
 app.post('/reset-password', async (req, res) => {
   const { token, newPassword } = req.body;
-
   try {
     // Verificar el token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const { email } = decoded;
-
+    console.log("email y decoded",email,decoded);
     const usuario = await db.query("SELECT * FROM usuarios WHERE email = ?", [email]);
     if (usuario.length === 0) {
       return res.status(404).json({ error: 'Usuario no encontrado.' });
@@ -660,13 +659,12 @@ app.post('/reset-password', async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     await db.query("UPDATE usuarios SET password = ?, reset_token = NULL WHERE email = ?", [hashedPassword, email]);
-
     res.json({ message: 'Contraseña actualizada con éxito.' });
   } catch (error) {
     if (err.name === 'TokenExpiredError') {
       return res.status(400).json({ error: 'El token ha expirado.' });
     }
-    return res.status(400).json({ error: 'Token inválido.' });
+     return res.status(400).json({ error: 'Token inválido.' });
   }
 });
 
