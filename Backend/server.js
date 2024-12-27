@@ -14,7 +14,11 @@ dotenv.config();
 const app = express();
 const PORT = 3000;
 const SECRET_KEY = process.env.JWT_SECRET;
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173', // Permitir solicitudes de localhost
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Métodos permitidos
+  allowedHeaders: ['Content-Type', 'Authorization'], // Cabeceras permitidas
+}));
 
 const s3Client = new S3Client({ region: "sa-east-1",
   credentials: {

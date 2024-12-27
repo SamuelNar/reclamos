@@ -1,12 +1,13 @@
 import { useState } from 'react';
-import { navigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import API from '../utils/api';
 import '../assets/styles/recover.css';
 
-function FormRecover() {
+function FormRecover() {    
     const [email, setEmail] = useState('');
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
+    const navigate = useNavigate();
     const handleSubmit = async (e) => {
         e.preventDefault();
         setMessage('');
