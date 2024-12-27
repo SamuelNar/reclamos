@@ -647,7 +647,7 @@ app.post('/reset-password', async (req, res) => {
 
   try {
     // Verificar el token
-    const decoded = jwt.verify(token, JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const { email } = decoded;
 
     const usuario = await db.query("SELECT * FROM usuarios WHERE email = ?", [email]);

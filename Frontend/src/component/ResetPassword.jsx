@@ -20,6 +20,7 @@ const ResetPassword = () => {
   }, [token, navigate]);
 
   const handleSubmit = async (e) => {
+    console.log("Token",token);
     e.preventDefault();
     setMessage('');
     setError('');

@@ -7,38 +7,32 @@ function FormRecover() {
     const [email, setEmail] = useState('');
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
+    const [isLoading, setIsLoading] = useState(false); // Nuevo estado de carga
     
     const navigate = useNavigate();
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setMessage('');
         setError('');
+        setIsLoading(true); // Activa el loading
+        
         try {
             const response = await API.post('/password-request', { email }, {
                 headers: {
-                  'Content-Type': 'application/json',
-                  'Access-Control-Allow-Origin': '*',  // Permitir cualquier origen
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*',  // Permitir cualquier origen
                 }
-              });           
-            {
-                   /* API.post('/password-request', { email })
-                     if (response.status === 200) {
-                setMessage('Si el email está registrado, se ha enviado un enlace de recuperación.');
-                setTimeout(() => {
-                    navigate('/'); // Redirige al usuario al login después de 5 segundos
-                  }, 5000);
-              } else {
-                setError('Ocurrió un error inesperado, por favor intenta de nuevo.');
-              }
-                */
-            }  
-            setMessage(response.data.message);  
+            });
+            setMessage(response.data.message);
             setTimeout(() => {
                 navigate('/login'); // Redirige al usuario al login después de 5 segundos
-              }, 5000);       
+            }, 5000);
         } catch (err) {
             console.error('Error en la recuperación de contraseña:', err);
             setError(err.response?.data?.error || 'Ocurrió un error, por favor intenta de nuevo.');
+        } finally {
+            setIsLoading(false); // Desactiva el loading
         }
     };
 
@@ -59,7 +53,11 @@ function FormRecover() {
                         required
                     />
                 </div>
-                <button className="submit-btn" type="submit">Enviar Enlace</button>
+                <button className="submit-btn" type="submit" disabled={isLoading}>
+                    {isLoading ? 'Enviando...' : 'Enviar Enlace'}
+                </button>
+
+                {/* Mostrar mensajes de éxito o error */}
                 {message && <p className="success-message">{message}</p>}
                 {error && <p className="error-message">{error}</p>}
             </form>
@@ -67,4 +65,4 @@ function FormRecover() {
     );
 }
 
-export default FormRecover
+export default FormRecover;
