@@ -14,7 +14,12 @@ dotenv.config();
 const app = express();
 const PORT = 3000;
 const SECRET_KEY = process.env.JWT_SECRET;
-app.use(cors());
+app.use(cors({
+  origin: ['http://localhost:5173', 'https://reclamos-production-2298.up.railway.app/'],
+  methods: ['GET', 'POST'],
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 const s3Client = new S3Client({ region: "sa-east-1",
   credentials: {
