@@ -10,7 +10,7 @@ import {
   faTimes,
   faSearch,
 } from "@fortawesome/free-solid-svg-icons";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,Navigate } from "react-router-dom";
 import API from "../utils/api";
 import { format } from "date-fns";
 import "../assets/styles/reclamos.css";
@@ -351,6 +351,9 @@ const Reclamos = ({ token, onLogout }) => {
     return null
   }
 
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
 
   return (
     <div className="reclamos-container">

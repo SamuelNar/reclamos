@@ -15,12 +15,20 @@ const app = express();
 const PORT = 3000;
 const SECRET_KEY = process.env.JWT_SECRET;
 app.use(cors({
-  origin: ['http://localhost:5173', 'https://reclamos-production-2298.up.railway.app/'],
-  methods: ['GET', 'POST'],
-  credentials: true,
-  allowedHeaders: ['Content-Type', 'Authorization']
+  origin: 'http://localhost:5173',
+  credentials: true
 }));
 
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', 'http://localhost:5173');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
+});
 const s3Client = new S3Client({ region: "sa-east-1",
   credentials: {
     accessKeyId: process.env.ACCESS_KEY,
@@ -610,7 +618,6 @@ app.post('/password-request', async (req, res) => {
     text: `Haz clic en el siguiente enlace para restablecer tu contraseña: ${resetLink}`,
     html: `<p>Haz clic en el siguiente enlace para restablecer tu contraseña:</p><a href="${resetLink}">${resetLink}</a>`,
   });
-
   res.json({ message: 'Si el email está registrado, se ha enviado un correo de recuperación.' });
 
 });

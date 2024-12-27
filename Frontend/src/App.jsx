@@ -21,6 +21,7 @@ function App() {
     setToken(newToken);
     localStorage.setItem("token", newToken);
     // Decodificar el token para verificar
+    console.log("Token",newToken);
     try {
       const decodedToken = JSON.parse(atob(newToken.split(".")[1]));         
       const currentUserId = decodedToken.id;
