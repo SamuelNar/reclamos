@@ -608,7 +608,7 @@ app.post('/password-request', async (req, res) => {
     }
 
     // Crear el token de restablecimiento
-    const resetToken = jwt.sign({ email }, JWT_SECRET, { expiresIn: "1h" });
+    const resetToken = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: "1h" });
 
     // Guardar el token en la base de datos
     await db.query("UPDATE usuarios SET token = ? WHERE email = ?", [resetToken, email]);
