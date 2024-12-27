@@ -599,28 +599,48 @@ app.put("/perfil/:id", async (req, res) => {
 app.post('/password-request', async (req, res) => {
   const { email } = req.body;
 
-  const usuario = db.query("SELECT * FROM usuarios WHERE email = ?", [email]);
-  
-  if ( usuario.length === 0) {
-    return res.status(404).json({ error: 'Usuario no encontrado' });
+  try {
+    // Verificar si el email existe
+    const usuario = await db.query("SELECT * FROM usuarios WHERE email = ?", [email]);
+    
+    if (usuario.length === 0) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+
+    // Crear el token de restablecimiento
+    const resetToken = jwt.sign({ email }, JWT_SECRET, { expiresIn: "1h" });
+
+    // Guardar el token en la base de datos
+    await db.query("UPDATE usuarios SET token = ? WHERE email = ?", [resetToken, email]);
+
+    // Crear el enlace de restablecimiento
+    const resetLink = `http://localhost:5173/reset-password?token=${resetToken}`;
+
+    // Enviar el correo
+    await transporter.sendMail({
+      from: `"Soporte" ${process.env.EMAIL_USER}`,
+      to: email,
+      subject: 'Recuperación de contraseña',
+      text: `Haz clic en el siguiente enlace para restablecer tu contraseña: ${resetLink}`,
+      html: `<p>Haz clic en el siguiente enlace para restablecer tu contraseña:</p><a href="${resetLink}">${resetLink}</a>`,
+    });
+
+    // Responder al cliente
+    res.json({ message: 'Si el email está registrado, se ha enviado un correo de recuperación.' });
+
+  } catch (error) {
+    console.error('Error al procesar la solicitud:', error);
+
+    // Enviar un mensaje de error apropiado
+    if (error.code === 'ECONNREFUSED') {
+      return res.status(500).json({ error: 'Error al conectarse a la base de datos.' });
+    }
+
+    // Otros errores
+    return res.status(500).json({ error: 'Ocurrió un error al procesar la solicitud.' });
   }
-
-  const resetToken = jwt.sign({ email }, JWT_SECRET, { expiresIn: "1h" });
-
-  await db.query("UPDATE usuarios SET token = ? WHERE email = ?", [resetToken, email]);
-
-  const resetLink = `http://localhost:5173/reset-password?token=${resetToken}`;
-
-  await transporter.sendMail({
-    from: `"Soporte" ${process.env.EMAIL_USER}`,
-    to: email,
-    subject: 'Recuperación de contraseña',
-    text: `Haz clic en el siguiente enlace para restablecer tu contraseña: ${resetLink}`,
-    html: `<p>Haz clic en el siguiente enlace para restablecer tu contraseña:</p><a href="${resetLink}">${resetLink}</a>`,
-  });
-  res.json({ message: 'Si el email está registrado, se ha enviado un correo de recuperación.' });
-
 });
+
 
 app.post('/reset-password', async (req, res) => {
   const { token, newPassword } = req.body;

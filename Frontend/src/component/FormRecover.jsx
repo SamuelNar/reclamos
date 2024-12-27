@@ -19,8 +19,7 @@ function FormRecover() {
                   'Content-Type': 'application/json',
                   'Access-Control-Allow-Origin': '*',  // Permitir cualquier origen
                 }
-              });
-              console.log("respuesta",response);
+              });           
             {
                    /* API.post('/password-request', { email })
                      if (response.status === 200) {
