@@ -141,7 +141,7 @@ app.post("/auth/login", async (req, res) => {
         username: user.username,
         rol: user.rol,
         password: user.password,
-        first_login: password === process.env.PREDETERMINDA},
+        first_login: password === "123123"},
         SECRET_KEY,
       {
         expiresIn: "1h",
