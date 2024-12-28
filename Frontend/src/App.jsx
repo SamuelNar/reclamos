@@ -25,8 +25,7 @@ function App() {
     try {
       const decodedToken = JSON.parse(atob(newToken.split(".")[1]));         
       const currentUserId = decodedToken.id;
-      localStorage.setItem("userId",currentUserId);
-      // Si la contraseña es 123123 o es primer login, redirigir a cambio de contraseña
+      localStorage.setItem("userId",currentUserId);      
       if (decodedToken?.password === "123123" || decodedToken?.first_login) {
         navigate(`/change-password/${currentUserId}`); 
       }

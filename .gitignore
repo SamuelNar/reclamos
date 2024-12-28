@@ -10,6 +10,7 @@ lerna-debug.log*
 /Backend/node_modules
 /Backend/usuario.js
 /Backend/.env
+/Frontend/.env
 node_modules
 dist
 dist-ssr

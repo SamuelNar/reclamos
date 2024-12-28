@@ -14,21 +14,8 @@ dotenv.config();
 const app = express();
 const PORT = 3000;
 const SECRET_KEY = process.env.JWT_SECRET;
-app.use(cors({
-  origin: 'http://localhost:5173',
-  credentials: true
-}));
+app.use(cors());
 
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'http://localhost:5173');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  if (req.method === 'OPTIONS') {
-    return res.sendStatus(200);
-  }
-  next();
-});
 const s3Client = new S3Client({ region: "sa-east-1",
   credentials: {
     accessKeyId: process.env.ACCESS_KEY,
@@ -154,7 +141,7 @@ app.post("/auth/login", async (req, res) => {
         username: user.username,
         rol: user.rol,
         password: user.password,
-        first_login: password === '123123'},
+        first_login: password === process.env.PREDETERMINDA},
         SECRET_KEY,
       {
         expiresIn: "1h",
@@ -598,27 +585,21 @@ app.put("/perfil/:id", async (req, res) => {
 
 app.post('/password-request', async (req, res) => {
   const { email } = req.body;
-
   try {
     // Verificar si el email existe
     const usuario = await db.query("SELECT * FROM usuarios WHERE email = ?", [email]);
-    
     if (usuario.length === 0) {
       return res.status(404).json({ error: 'Usuario no encontrado' });
     }
-
     // Crear el token de restablecimiento
-    const resetToken = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: "1h" });
-
+    const resetToken = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: "15m" });  
     // Guardar el token en la base de datos
-    await db.query("UPDATE usuarios SET token = ? WHERE email = ?", [resetToken, email]);
-
+    await db.query("UPDATE usuarios SET token = ? WHERE email = ?", [resetToken, email]);       
     // Crear el enlace de restablecimiento
-    const resetLink = `http://localhost:5173/reset-password?token=${resetToken}`;
-
+    const resetLink = `http://localhost:5173/reset-password?token=${resetToken}`; //cambiar a lidercom.net.ar
     // Enviar el correo
     await transporter.sendMail({
-      from: `"Soporte" ${process.env.EMAIL_USER}`,
+      from: `"Soporte LiderCom" ${process.env.EMAIL_USER}`,
       to: email,
       subject: 'Recuperación de contraseña',
       text: `Haz clic en el siguiente enlace para restablecer tu contraseña: ${resetLink}`,
@@ -626,7 +607,7 @@ app.post('/password-request', async (req, res) => {
     });
 
     // Responder al cliente
-    res.json({ message: 'Si el email está registrado, se ha enviado un correo de recuperación.' });
+    res.json({ message: 'Si el email está registrado, se recibira un correo de recuperación.' });
 
   } catch (error) {
     console.error('Error al procesar la solicitud:', error);
@@ -643,22 +624,18 @@ app.post('/password-request', async (req, res) => {
 
 
 app.post('/reset-password', async (req, res) => {
-  const { token, newPassword } = req.body;
-  try {
-    // Verificar el token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const { email } = decoded;
-    console.log("email y decoded",email,decoded);
-    const usuario = await db.query("SELECT * FROM usuarios WHERE email = ?", [email]);
+  const { token, newPassword } = req.body; 
+  try {    
+    const [usuario] = await db.query("SELECT * FROM usuarios WHERE token = ?", [token]);        
     if (usuario.length === 0) {
       return res.status(404).json({ error: 'Usuario no encontrado.' });
-    }
+    }   
+    const email = usuario[0].email;
     if (usuario[0].token !== token) {
       return res.status(400).json({ error: 'Token inválido.' });
     }
-
     const hashedPassword = await bcrypt.hash(newPassword, 10);
-    await db.query("UPDATE usuarios SET password = ?, reset_token = NULL WHERE email = ?", [hashedPassword, email]);
+    await db.query("UPDATE usuarios SET password = ?, token = NULL WHERE email = ?", [hashedPassword, email]);
     res.json({ message: 'Contraseña actualizada con éxito.' });
   } catch (error) {
     if (err.name === 'TokenExpiredError') {
