@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API = axios.create({
-  baseURL: 'https://reclamos-production-2298.up.railway.app/',
+  baseURL: 'https//localhost:3000',  //https://reclamos-production-2298.up.railway.app/
 });
 
 // Configurar los encabezados globalmente
