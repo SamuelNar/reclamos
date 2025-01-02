@@ -302,6 +302,7 @@ function CrearReclamo() {
               <option value="">Asignar a</option>
               <option value="Agustin G">Agustin G</option>
               <option value="Agustin P">Agustin P</option>
+              <option value="Darel">Ezequiel</option>
               <option value="Gabriel">Gabriel</option>
               <option value="Gaston">Gaston</option>
               <option value="Joel">Joel</option>
