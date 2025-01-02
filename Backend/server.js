@@ -32,16 +32,8 @@ const db = mysql.createPool({
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
+  port: process.env.PORT_DATABASE 
 });
-
-
-const clientesDb = mysql.createPool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME2,
-});
-
 
 const transporter = nodemailer.createTransport({
   host: process.env.HOST_EMAIL,
@@ -191,7 +183,7 @@ app.get("/reclamos/:id", async (req, res) => {
 
 app.get("/clientes", async (req, res) => {
   try {
-    const [rows] = await clientesDb.query("SELECT * FROM cliente");
+    const [rows] = await db.query("SELECT * FROM cliente");
     res.status(200).json(rows);
   } catch (error) {
     res
@@ -203,7 +195,7 @@ app.get("/clientes", async (req, res) => {
 app.get("/clientes/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    const [rows] = await clientesDb.query("SELECT * FROM cliente WHERE id = ?", id);
+    const [rows] = await db.query("SELECT * FROM cliente WHERE id = ?", id);
     res.status(200).json(rows);
   } catch (error) {
     res
@@ -531,7 +523,7 @@ app.get('/reclamos/firma/:cliente_id', async (req, res) => {
 app.get("/perfil/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    const [rows] = await clientesDb.query(
+    const [rows] = await db.query(
       "SELECT nombre, cuit, direccion, localidad, provincia, telefono, email FROM cliente WHERE id = ?",
       [id]
     );
@@ -554,7 +546,7 @@ app.put("/perfil/:id", async (req, res) => {
   const { cuit, direccion, localidad, provincia, telefono, email } = req.body;
   try {
     // Actualizar los datos del perfil sin modificar el nombre
-    const [result] = await clientesDb.query(
+    const [result] = await db.query(
       "UPDATE cliente SET cuit = ?, direccion = ?, localidad = ?, provincia = ?, telefono = ?, email = ? WHERE id = ?",
       [cuit, direccion, localidad, provincia, telefono, email, id]
     );
