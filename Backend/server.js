@@ -16,7 +16,8 @@ const PORT = 3000;
 const SECRET_KEY = process.env.JWT_SECRET;
 app.use(cors());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const s3Client = new S3Client({ region: "sa-east-1",
   credentials: {
     accessKeyId: process.env.ACCESS_KEY,
