@@ -304,6 +304,7 @@ function CrearReclamo() {
               <option value="Agustin P">Agustin P</option>
               <option value="Gabriel">Gabriel</option>
               <option value="Gaston">Gaston</option>
+              <option value="Joel">Joel</option>
               <option value="Matias">Matias</option>
               <option value="Maxi">Maxi</option>
               <option value="Samuel">Samuel</option>              
