@@ -75,7 +75,9 @@ function Perfil() {
         telefono: false,
         email: false,
       }); // Desactiva todos los modos de edición
+      alert("Perfil actualizado correctamente");
     } catch (error) {
+      alert("Error al actualizar perfil, contactar al administrador");
       setError("Error al actualizar perfil", error);
     }
   };
