@@ -15,9 +15,10 @@ const app = express();
 const PORT = 3000;
 const SECRET_KEY = process.env.JWT_SECRET;
 app.use(cors());
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 const s3Client = new S3Client({ region: "sa-east-1",
   credentials: {
     accessKeyId: process.env.ACCESS_KEY,
@@ -151,8 +152,7 @@ app.post("/auth/login", async (req, res) => {
 
 app.post("/auth/logout", authenticateToken, (req, res) => {
   // Si necesitas mantener un registro de los tokens invalidados,
-  // podrías almacenarlos en una lista de tokens bloqueados.
-  
+  // podrías almacenarlos en una lista de tokens bloqueados.  
   res.status(200).json({ message: "Sesión cerrada exitosamente" });
 });
 
