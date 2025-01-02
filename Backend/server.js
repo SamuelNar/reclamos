@@ -15,6 +15,7 @@ const app = express();
 const PORT = 3000;
 const SECRET_KEY = process.env.JWT_SECRET;
 app.use(cors());
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 const s3Client = new S3Client({ region: "sa-east-1",
   credentials: {
@@ -243,6 +244,7 @@ app.post("/reclamos", authenticateToken, async (req, res) => {
       [nombre, finalProducto, finalDescripcion, importancia,observaciones, estado, asignado, cliente_id,sector]
     );
 
+    /*
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: 'gdiaz@lidercom.net.ar', 
@@ -258,7 +260,7 @@ app.post("/reclamos", authenticateToken, async (req, res) => {
       } else {
         console.log('Correo enviado:', info.response);
       }
-    });
+    });*/
 
     // Responder con el nuevo reclamo creado
     res.status(201).json({
@@ -404,29 +406,26 @@ app.patch("/reclamos/:id/estado", async (req, res) => {
 });
 
 
-const uploadToS3 = async (fileBuffer, fileName) => {
-  const params = {
-    Bucket: 'reclamoslidercom',
-    Key: `firmas/${fileName}`,
-    Body: fileBuffer,
-    ContentType: 'image/png',
-  };
-
+const saveToLocal = async (fileBuffer, fileName) => {
+  const filePath = path.join(__dirname, 'uploads', 'firmas', fileName); // Ruta local para guardar las firmas
   try {
-    const command = new PutObjectCommand(params);
-    await s3Client.send(command);
-    
-    // Construir y retornar la URL del archivo
-    const fileUrl = `https://reclamoslidercom.s3.amazonaws.com/firmas/${fileName}`;
-    console.log('Archivo subido exitosamente:', fileUrl);
-    return fileUrl;
+    // Asegurarte de que la carpeta 'uploads/firmas' exista
+    fs.mkdirSync(path.dirname(filePath), { recursive: true });
+
+    // Guardar el archivo en la carpeta local
+    fs.writeFileSync(filePath, fileBuffer);
+
+    console.log('Archivo guardado localmente en:', filePath);
+
+    // Retornar la ruta del archivo guardado
+    return filePath;
   } catch (error) {
-    console.error('Error al subir archivo:', error);
+    console.error('Error al guardar archivo localmente:', error);
     throw error;
   }
 };
 
-
+/*
 // Agregar firma al reclamo
 app.put("/reclamos/:id/firma", async (req, res) => {
   const { firma } = req.body; // Firma en formato base64
@@ -511,6 +510,74 @@ app.get('/reclamos/firma/:cliente_id', async (req, res) => {
     // Construir las URLs de las firmas usando el dominio del backend en producción
     const baseUrl = 'https://reclamos-production-2298.up.railway.app';
     const firmasURLs = firmasValidas.map(firma => `${baseUrl}/firmas/${path.basename(firma)}`);
+
+    res.status(200).json({ firmas: firmasURLs });
+  } catch (error) {
+    console.error("Error al obtener las firmas:", error);
+    res.status(500).json({ error: "Error al obtener las firmas", details: error.message });
+  }
+});*/
+
+app.put("/reclamos/:id/firma", async (req, res) => {
+  const { firma } = req.body; // Firma en formato base64
+  const reclamoId = req.params.id;
+
+  if (!firma) {
+    return res.status(400).json({ error: "Firma es requerida" });
+  }
+
+  try {
+    // Convertir la firma base64 a un buffer
+    const base64Data = firma.replace(/^data:image\/png;base64,/, "");
+    const fileBuffer = Buffer.from(base64Data, "base64");
+
+    const fileName = `reclamo_${reclamoId}.png`;
+
+    // Guardar la firma localmente
+    const filePath = await saveToLocal(fileBuffer, fileName);
+
+    // Actualizar la base de datos con la ruta local de la firma
+    const [result] = await db.query(
+      "UPDATE reclamos SET firma = ? WHERE id = ?",
+      [filePath, reclamoId]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "Reclamo no encontrado" });
+    }
+
+    res.status(200).json({
+      message: "Firma actualizada exitosamente",
+      filePath, // Incluye la ruta del archivo guardado
+    });
+  } catch (error) {
+    console.error("Error al guardar la firma:", error);
+    res.status(500).json({
+      error: "Error al guardar la firma",
+      details: error.message,
+    });
+  }
+});
+
+app.get('/reclamos/firma/:cliente_id', async (req, res) => {
+  const { cliente_id } = req.params;
+
+  try {
+    // Consultar las firmas de la base de datos
+    const [rows] = await db.query(
+      "SELECT firma FROM reclamos WHERE cliente_id = ?",
+      [cliente_id]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ error: "No se encontraron firmas para este cliente" });
+    }
+
+    // Construir las URLs de las firmas usando el dominio del backend
+    const baseUrl = 'https://reclamos-production-2298.up.railway.app';
+    const firmasURLs = rows
+      .filter(row => row.firma !== null)
+      .map(row => `${baseUrl}/${row.firma.replace(__dirname, '')}`); // Reemplazar ruta absoluta por relativa
 
     res.status(200).json({ firmas: firmasURLs });
   } catch (error) {
