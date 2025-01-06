@@ -315,7 +315,7 @@ app.put("/reclamos/:id", authenticateToken, async (req, res) => {
 
     // Verificar si se actualizó algún registro
     if (result.affectedRows === 0) {
-      return res.status(404).json({ error: "Reclamo no encontrado" });
+      return res.status(100).json({ error: "Reclamo no encontrado" });
     }
 
     res.status(200).json({
@@ -643,7 +643,6 @@ app.put("/perfil/:id", async (req, res) => {
   }
 });
 
-
 app.post('/password-request', async (req, res) => {
   const { email } = req.body;
   try {
@@ -657,7 +656,7 @@ app.post('/password-request', async (req, res) => {
     // Guardar el token en la base de datos
     await db.query("UPDATE usuarios SET token = ? WHERE email = ?", [resetToken, email]);       
     // Crear el enlace de restablecimiento
-    const resetLink = `http://localhost:5173/reset-password?token=${resetToken}`; //cambiar a lidercom.net.ar
+    const resetLink = `http://lidercom.net.ar/reset-password?token=${resetToken}`; //cambiar a lidercom.net.ar
     // Enviar el correo
     await transporter.sendMail({
       from: `"Soporte LiderCom" ${process.env.EMAIL_USER}`,

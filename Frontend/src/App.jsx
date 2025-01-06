@@ -7,7 +7,6 @@ import ChangePassword from './component/ChangePassword';
 import Perfil from './component/Perfil';
 import FormRecover from './component/FormRecover';
 import ResetPassword from './component/ResetPassword';
-// Componente de ruta protegida
 // eslint-disable-next-line react/prop-types
 const ProtectedRoute = ({ token, children }) => {
   return token ? children : <Navigate to="/login" replace />;
@@ -19,9 +18,7 @@ function App() {
 
   const handleLogin = (newToken) => {
     setToken(newToken);
-    localStorage.setItem("token", newToken);
-    // Decodificar el token para verificar
-    console.log("Token",newToken);
+    localStorage.setItem("token", newToken);   
     try {
       const decodedToken = JSON.parse(atob(newToken.split(".")[1]));         
       const currentUserId = decodedToken.id;

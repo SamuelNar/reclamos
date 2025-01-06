@@ -11,8 +11,7 @@ function FirmaImagen() {
   useEffect(() => {
     const fetchFirmas = async () => {
       try {
-        const response = await API.get(`/reclamos/firma/${cliente_id}`);
-        console.log(response);
+        const response = await API.get(`/reclamos/firma/${cliente_id}`);      
         if (response.status === 200) {
           const data = await response.json(); // Obtener JSON desde la respuesta
           setFirmas(data.firmas || []); // Establecer las firmas

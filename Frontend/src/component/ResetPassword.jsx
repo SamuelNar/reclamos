@@ -19,8 +19,7 @@ const ResetPassword = () => {
     }
   }, [token, navigate]);
 
-  const handleSubmit = async (e) => {
-    console.log("Token",token);
+  const handleSubmit = async (e) => {  
     e.preventDefault();
     setMessage('');
     setError('');
